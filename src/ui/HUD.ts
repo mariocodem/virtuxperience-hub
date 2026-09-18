@@ -2,6 +2,7 @@ export class HUD {
   private readonly crosshairEl: HTMLDivElement;
   private readonly promptEl: HTMLDivElement;
   private readonly lockHintEl: HTMLDivElement;
+  private readonly badgeButtonEl: HTMLButtonElement;
   private touchMode = false;
   private currentZoneName: string | undefined;
 
@@ -19,6 +20,15 @@ export class HUD {
     this.lockHintEl.className = "hud-lock-hint";
     this.lockHintEl.textContent = "Haz clic para jugar";
     root.appendChild(this.lockHintEl);
+
+    this.badgeButtonEl = document.createElement("button");
+    this.badgeButtonEl.className = "hud-badge-button";
+    this.badgeButtonEl.textContent = "🏅 Insignias";
+    root.appendChild(this.badgeButtonEl);
+  }
+
+  onBadgeButtonClick(handler: () => void): void {
+    this.badgeButtonEl.addEventListener("click", handler);
   }
 
   showZonePrompt(zoneName: string): void {

@@ -11,6 +11,7 @@ import { PlayerController } from "./scene/PlayerController";
 import { AR_SCALE, setupXR } from "./xr/setupXR";
 import { HUD } from "./ui/HUD";
 import { ZonePanel } from "./ui/ZonePanel";
+import { BadgePanel } from "./ui/BadgePanel";
 import { ZONE_TRIGGER_RADIUS } from "./scene/zones.config";
 import type { ZoneEnterContext } from "./types/zone";
 import type { WebXRCamera } from "@babylonjs/core";
@@ -30,6 +31,15 @@ async function bootstrap(): Promise<void> {
 
   const hud = new HUD(uiRoot);
   const zonePanel = new ZonePanel(uiRoot);
+  const badgePanel = new BadgePanel(uiRoot);
+
+  function toggleBadgePanel(): void {
+    if (zonePanel.isOpen()) return;
+    badgePanel.toggle(() => player.setEnabled(true));
+    if (badgePanel.isOpen()) player.setEnabled(false);
+  }
+
+  hud.onBadgeButtonClick(() => toggleBadgePanel());
 
   let arCamera: WebXRCamera | undefined;
 
@@ -75,7 +85,9 @@ async function bootstrap(): Promise<void> {
   }
 
   window.addEventListener("keydown", (event) => {
-    if (event.key.toLowerCase() === "e") attemptEnterZone();
+    const key = event.key.toLowerCase();
+    if (key === "e") attemptEnterZone();
+    if (key === "b") toggleBadgePanel();
   });
 
   game.scene.onBeforeRenderObservable.add(() => {

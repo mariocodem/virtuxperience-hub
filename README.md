@@ -204,6 +204,11 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 
 Todos los minijuegos comparten: barra de progreso por pregunta, temporizador, pantalla de resultados al finalizar y desbloqueo de una **insignia** (`BadgeSystem`) persistida en `localStorage` la primera vez que se completan.
 
+### Panel de insignias
+- Botón "🏅 Insignias" visible en la esquina superior derecha del hub (clic o tecla `B`) que abre un panel con el catálogo completo de 12 insignias (dos por línea transversal: primera ronda completada y ronda perfecta).
+- Cada insignia muestra su estado — desbloqueada (🏅) o bloqueada (🔒) — junto a su nombre y descripción, con un contador de progreso (`X / 12 desbloqueadas`).
+- El estado se lee directamente de `localStorage`, por lo que persiste entre sesiones del navegador.
+
 ### Realidad aumentada (WebXR, experimental)
 - Botón de entrada a sesión `immersive-ar` cuando el navegador/dispositivo lo soporta.
 - `hit-test` contra superficies reales para colocar el hub completo sobre el suelo detectado por la cámara.
@@ -222,6 +227,7 @@ Todos los minijuegos comparten: barra de progreso por pregunta, temporizador, pa
 | Mirar alrededor | Mouse (clic sobre el canvas activa el *pointer lock*) |
 | Entrar a una zona / minijuego | `E` (estando dentro del radio de una zona) |
 | Responder / dibujar en un minijuego | Clic o touch, según el minijuego |
+| Ver insignias obtenidas | `B` o clic en el botón "🏅 Insignias" |
 | Entrar a RA (si el dispositivo lo soporta) | Botón de RA en pantalla |
 
 ---
@@ -235,6 +241,7 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 | ![Hub central](docs/evidencias/hub-general.png) | Hub central con los portales de las 6 zonas visibles (Latido Social, Comunicarte y NeuroMath en cuadro). |
 | ![NeuroMath](docs/evidencias/neuromath-drawing.png) | Zona de NeuroMath cargando el modelo de reconocimiento de escritura antes de iniciar. |
 | ![Comunicarte](docs/evidencias/comunicarte-oracion.png) | Minijuego de Comunicarte: reconstrucción de una frase por palabras. |
+| ![Panel de insignias](docs/evidencias/insignias.png) | Panel de insignias mostrando el progreso (2/12) con estados bloqueado/desbloqueado. |
 | ![VoxCivitas](docs/evidencias/voxcivitas-dilema.png) | Minijuego de VoxCivitas: dilema ciudadano con dos opciones. |
 | ![Gerencia+](docs/evidencias/gerencia-recursos.png) | Minijuego de Gerencia+: reparto de horas entre iniciativas con presupuesto limitado. |
 
