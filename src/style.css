@@ -1,0 +1,877 @@
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #05050a;
+  font-family: system-ui, sans-serif;
+}
+
+#renderCanvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  display: block;
+  outline: none;
+}
+
+#ui-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hud-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.hud-prompt {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.hud-lock-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.hud-badge-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.hud-badge-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.badge-panel {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.badge-panel-card {
+  background: #14141c;
+  border-radius: 12px;
+  padding: 28px 32px;
+  width: min(520px, 90vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.badge-panel-card h2 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  color: white;
+}
+
+.badge-panel-count {
+  margin: 0 0 16px;
+  color: #999;
+  font-size: 13px;
+}
+
+.badge-panel-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.badge-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  opacity: 0.5;
+}
+
+.badge-item.unlocked {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.badge-item-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.badge-item-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.badge-item-zone {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7a9cc9;
+}
+
+.badge-item-text strong {
+  color: white;
+  font-size: 14px;
+}
+
+.badge-item-text p {
+  margin: 2px 0 0;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.badge-panel-card > button {
+  align-self: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.zone-panel {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+}
+
+.zone-panel-card {
+  background: #14141c;
+  border-radius: 12px;
+  padding: 32px 40px;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.zone-panel-card h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+}
+
+.zone-panel-card p {
+  margin: 0 0 8px;
+  color: #ccc;
+}
+
+.zone-panel-badge {
+  display: inline-block;
+  margin: 12px 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.zone-panel-card button {
+  margin-top: 12px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #2fa5d8;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.zone-panel-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.zone-panel-actions button {
+  margin-top: 12px;
+}
+
+.zone-panel-card button.secondary {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.neuromath-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.neuromath-question-bar {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 12px 24px;
+  border-radius: 10px;
+  min-width: 260px;
+  transition: box-shadow 0.15s ease-out;
+}
+
+.neuromath-progress {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.neuromath-prompt {
+  color: white;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.neuromath-timer-track {
+  width: 220px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.neuromath-timer-fill {
+  height: 100%;
+  width: 100%;
+  background: #7a4fe0;
+}
+
+.neuromath-hud.flash-hit .neuromath-question-bar {
+  box-shadow: 0 0 0 3px #2fe07a;
+}
+
+.neuromath-hud.flash-miss .neuromath-question-bar {
+  box-shadow: 0 0 0 3px #e02f2f;
+}
+
+.neuromath-drawing-panel {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.drawing-canvas {
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  cursor: crosshair;
+  touch-action: none;
+  background: #000000;
+}
+
+.neuromath-hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  text-align: center;
+  max-width: 340px;
+}
+
+.neuromath-drawing-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.neuromath-drawing-actions button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #2fa5d8;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.neuromath-drawing-actions button.secondary {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.neuromath-feedback {
+  min-height: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+}
+
+.comunicarte-panel {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+  max-width: 560px;
+}
+
+.comunicarte-built {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+}
+
+.comunicarte-placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  align-self: center;
+}
+
+.comunicarte-pool {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.comunicarte-chip {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.comunicarte-chip.built {
+  background: rgba(47, 165, 216, 0.25);
+  color: white;
+  border: 1px solid rgba(47, 165, 216, 0.6);
+}
+
+.comunicarte-chip.pool {
+  background: #2fa5d8;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.comunicarte-hud.flash-hit .neuromath-question-bar {
+  box-shadow: 0 0 0 3px #2fe07a;
+}
+
+.comunicarte-hud.flash-miss .neuromath-question-bar {
+  box-shadow: 0 0 0 3px #e02f2f;
+}
+
+.activaidea-panel {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+  max-width: 520px;
+}
+
+.activaidea-question-bar {
+  min-width: 420px;
+  max-width: 560px;
+}
+
+.activaidea-problem {
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.activaidea-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.activaidea-option {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(224, 92, 47, 0.18);
+  color: white;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.activaidea-option:hover:not(:disabled) {
+  background: rgba(224, 92, 47, 0.32);
+}
+
+.activaidea-option:disabled {
+  cursor: default;
+}
+
+.activaidea-option.correct {
+  background: rgba(47, 224, 122, 0.35);
+  border-color: #2fe07a;
+}
+
+.activaidea-option.incorrect {
+  background: rgba(224, 47, 47, 0.35);
+  border-color: #e02f2f;
+  opacity: 0.7;
+}
+
+.activaidea-hud.flash-hit .activaidea-question-bar {
+  box-shadow: 0 0 0 3px #2fe07a;
+}
+
+.activaidea-hud.flash-miss .activaidea-question-bar {
+  box-shadow: 0 0 0 3px #e02f2f;
+}
+
+.gerencia-panel {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+  max-width: 460px;
+  width: 90vw;
+}
+
+.gerencia-question-bar {
+  min-width: 380px;
+  max-width: 500px;
+}
+
+.gerencia-budget {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gerencia-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.gerencia-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.gerencia-row-name {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.gerencia-row-meta {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.gerencia-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.gerencia-row-controls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: #2fe07a;
+  color: #0a0a12;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.gerencia-row-controls button:disabled {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: default;
+}
+
+.gerencia-row-count {
+  color: white;
+  font-size: 15px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.gerencia-confirm {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #2fa5d8;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.gerencia-confirm:disabled {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: default;
+}
+
+.gerencia-hud.flash-hit .gerencia-question-bar {
+  box-shadow: 0 0 0 3px #2fe07a;
+}
+
+.gerencia-hud.flash-miss .gerencia-question-bar {
+  box-shadow: 0 0 0 3px #e02f2f;
+}
+
+.voxcivitas-panel {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+  max-width: 700px;
+  width: 92vw;
+}
+
+.voxcivitas-question-bar {
+  min-width: 420px;
+  max-width: 640px;
+}
+
+.voxcivitas-options {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+.voxcivitas-option {
+  flex: 1;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(224, 162, 47, 0.18);
+  color: white;
+  font-size: 15px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.voxcivitas-option:hover:not(:disabled) {
+  background: rgba(224, 162, 47, 0.32);
+}
+
+.voxcivitas-option:disabled {
+  cursor: default;
+}
+
+.voxcivitas-option.correct {
+  background: rgba(47, 224, 122, 0.35);
+  border-color: #2fe07a;
+}
+
+.voxcivitas-option.incorrect {
+  background: rgba(224, 47, 47, 0.35);
+  border-color: #e02f2f;
+  opacity: 0.7;
+}
+
+.voxcivitas-hud.flash-hit .voxcivitas-question-bar {
+  box-shadow: 0 0 0 3px #2fe07a;
+}
+
+.voxcivitas-hud.flash-miss .voxcivitas-question-bar {
+  box-shadow: 0 0 0 3px #e02f2f;
+}
+
+@media (max-width: 640px) {
+  .voxcivitas-options {
+    flex-direction: column;
+  }
+}
+
+.latidosocial-hud {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+  max-width: 760px;
+  width: 94vw;
+}
+
+.latidosocial-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10, 12, 20, 0.72);
+  border: 1px solid rgba(224, 47, 92, 0.4);
+  border-radius: 14px;
+  padding: 16px 20px;
+  width: 100%;
+}
+
+.latidosocial-status {
+  color: white;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+.latidosocial-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.latidosocial-card {
+  min-height: 76px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(224, 47, 92, 0.22);
+  color: white;
+  font-size: 13px;
+  line-height: 1.3;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.latidosocial-card:hover:not(:disabled) {
+  background: rgba(224, 47, 92, 0.36);
+  transform: translateY(-2px);
+}
+
+.latidosocial-card.flipped {
+  background: rgba(224, 47, 92, 0.5);
+}
+
+.latidosocial-card.matched {
+  background: rgba(47, 224, 122, 0.35);
+  border-color: #2fe07a;
+  cursor: default;
+}
+
+.latidosocial-card.wrong {
+  background: rgba(224, 47, 47, 0.4);
+  border-color: #e02f2f;
+}
+
+.latidosocial-feedback {
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .latidosocial-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.xr-error-banner {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(160, 20, 20, 0.95);
+  color: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.neuromath-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 16px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  max-width: 320px;
+  text-align: center;
+}
+
+/* --- Sonido, transición entre zonas y aviso de insignias --- */
+
+.hud-audio-button {
+  position: absolute;
+  top: 16px;
+  right: 156px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.hud-audio-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.zone-transition {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: radial-gradient(circle at center, #fff 0%, var(--zone-color) 38%, transparent 78%);
+  opacity: 0;
+  animation: zone-warp 0.6s ease-out forwards;
+}
+
+@keyframes zone-warp {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  35% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+.badge-toast {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: min(420px, 90vw);
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: rgba(20, 20, 32, 0.92);
+  border: 1px solid rgba(255, 210, 90, 0.6);
+  color: white;
+  text-align: center;
+  pointer-events: none;
+  animation: badge-toast-in 0.4s ease-out;
+}
+
+.badge-toast.leaving {
+  animation: badge-toast-out 0.4s ease-in forwards;
+}
+
+.badge-toast-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.badge-toast-detail {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+@keyframes badge-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -16px);
+  }
+}
+
+@keyframes badge-toast-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -16px);
+  }
+}
