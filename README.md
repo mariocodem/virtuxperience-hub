@@ -288,3 +288,4 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 - **Verificación de tipos**: `npx tsc --noEmit` (sin errores).
 - **Build de producción**: `npm run build` (genera `dist/` sin errores; advertencia de tamaño de chunk esperada por el peso de Babylon.js + TensorFlow.js, no es un error).
 - **No se requieren credenciales, tokens ni cuentas de terceros** para instalar, ejecutar o evaluar el proyecto.
+- Link en vercel: https://virtuxperience-hub.vercel.app/ 
