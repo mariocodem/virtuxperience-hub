@@ -2,7 +2,7 @@
 
 > Ecosistema virtual inmersivo (WebXR/3D) para UNIMINUTO Virtual: un hub navegable en primera persona desde el que se accede a 6 minijuegos educativos, cada uno alineado a una línea transversal de competencias.
 
-**Demo en vivo (si el evaluador la solicita):** ejecutar en local siguiendo la sección [Instalación y ejecución](#instalación-y-ejecución). El proyecto no requiere backend ni cuenta externa.
+**Demo en vivo:** **<https://virtuxperience-hub.vercel.app>** — se abre directo en el navegador (PC o celular), sin instalar nada. También se puede ejecutar en local siguiendo la sección [Instalación y ejecución](#instalación-y-ejecución). El proyecto no requiere backend ni cuenta externa.
 
 ---
 
@@ -90,6 +90,17 @@ npm run preview   # Sirve el build de producción localmente para verificarlo
 
 No se requiere ninguna variable de entorno ni archivo `.env`: el proyecto no consume APIs externas.
 
+### Despliegue (Vercel)
+
+La versión pública vive en <https://virtuxperience-hub.vercel.app>. Al ser un sitio 100% estático, Vercel solo ejecuta `npm run build` y sirve `dist/` (configurado en [`vercel.json`](vercel.json)). Vercel entrega HTTPS con un certificado válido, así que desde el link público la cámara y la RA funcionan sin la advertencia de "certificado no confiable" del servidor local.
+
+El repositorio está conectado a Vercel: cada push a `master` publica una nueva versión automáticamente. Para desplegar a mano desde la terminal:
+
+```bash
+npx vercel login          # una sola vez
+npx vercel deploy --prod
+```
+
 ---
 
 ## Estructura del proyecto
@@ -98,6 +109,7 @@ No se requiere ninguna variable de entorno ni archivo `.env`: el proyecto no con
 Proyecto-inmersivo/
 ├── index.html                  # Punto de entrada HTML (canvas + contenedor de UI)
 ├── vite.config.ts              # Configuración de Vite + plugin de HTTPS local
+├── vercel.json                 # Configuración de despliegue en Vercel (build + caché de assets)
 ├── tsconfig.json               # Configuración de TypeScript en modo estricto
 ├── docs/
 │   ├── CONTEXTO-PEDAGOGICO.md  # Descripción pedagógica/estratégica de VirtuXperience
@@ -283,6 +295,7 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 
 ## Información para la evaluación
 
+- **Probar sin instalar nada**: <https://virtuxperience-hub.vercel.app>.
 - **Punto de entrada para revisar código**: [`src/main.ts`](src/main.ts) orquesta toda la aplicación; desde ahí es fácil rastrear cada subsistema.
 - **Para revisar un minijuego específico**: abrir `src/minigames/<zona>/` — cada uno es autocontenido y sigue el mismo contrato (`ZoneEnterContext`) definido en [`src/types/zone.ts`](src/types/zone.ts).
 - **Verificación de tipos**: `npx tsc --noEmit` (sin errores).
