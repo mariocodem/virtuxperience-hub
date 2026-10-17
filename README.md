@@ -216,11 +216,12 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 
 ## Funcionalidades desarrolladas
 
-### Landing page y mapa de islas
-- Cabecera y hero inspirados en la landing real de VirtuXperience (UNIMINUTO Virtual): título, descripción y llamado a la acción que baja hasta el mapa.
-- **Mapa de islas tipo videojuego**: las 6 líneas transversales como nodos conectados por un camino punteado sobre un fondo de atardecer/océano, cada uno con ícono, nombre, descripción corta y contador de insignias (`X / 2`).
-- **Progresión por insignias**: la primera isla siempre está desbloqueada; cada una siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior. Una isla bloqueada muestra 🔒 y, si se le hace clic, vibra en vez de entrar.
-- El contador de insignias de la cabecera y el estado de cada isla se recalculan cada vez que se vuelve a la landing page (p. ej. justo después de ganar una insignia).
+### Landing page: réplica cercana de la de UNIMINUTO
+- Construida mirando directamente la landing real de VirtuXperience (`uniminuto.edu/virtuxperience-home`): misma paleta (azul marino `#0e1a3d`, dorado `#ffd300`, teal de acento), misma tipografía (Lato, vía Google Fonts), mismo wordmark "VirtuXperience" con patrón de puntos y diamantes en el hero, y la misma sección "Competencias → Potenciamos tu desarrollo integral" con sus 6 tarjetas — colores de ícono y textos (nombre, frase) tomados de la página real.
+- **Esa misma grilla de tarjetas es el mapa de islas**: cada tarjeta lleva un número de orden, un ícono propio por línea, su insignia de progreso (`X / 2`) y un botón "Entrar"/"Bloqueada". Hacer clic en una tarjeta bloqueada la hace vibrar en vez de entrar.
+- **Progresión por insignias**: la primera isla siempre está desbloqueada; cada siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior.
+- El contador de insignias de la cabecera y el estado de cada tarjeta se recalculan cada vez que se vuelve a la landing page (p. ej. justo después de ganar una insignia).
+- No reproduce el menú institucional completo (mega-menús, donaciones, footer con decenas de enlaces y logos) ni la fotografía de la página real: eso es contenido/branding propio de UNIMINUTO ajeno al alcance de esta prueba técnica.
 
 ### Cada isla: un mundo 3D independiente
 - Al entrar a una isla desbloqueada, la aplicación construye su propio mundo en primera persona (WASD + mouse look con pointer lock): un islote con césped al centro, playa de arena alrededor y océano animado hasta el horizonte, con un muro invisible que mantiene al jugador en tierra.
@@ -248,12 +249,12 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 
 | Zona | Minijuego | Mecánica |
 | --- | --- | --- |
-| **Comunicarte** | Ordena la frase | El jugador reconstruye 5 frases haciendo clic en las palabras en el orden correcto, contrarreloj. |
+| **ComunicArte** | Ordena la frase | El jugador reconstruye 5 frases haciendo clic en las palabras en el orden correcto, contrarreloj. |
 | **NeuroMath** | Dibuja la respuesta | El jugador resuelve 5 operaciones matemáticas **dibujando el dígito de la respuesta a mano** sobre un canvas; un modelo de TensorFlow.js entrenado en el navegador reconoce el número dibujado. |
-| **VoxCivitas** | Dilemas ciudadanos | 5 dilemas de convivencia y ciudadanía con dos opciones cada uno; el jugador elige y recibe retroalimentación justificando la respuesta correcta. |
+| **Voxcivitas** | Dilemas ciudadanos | 5 dilemas de convivencia y ciudadanía con dos opciones cada uno; el jugador elige y recibe retroalimentación justificando la respuesta correcta. |
 | **Gerencia+** | Reparto de recursos | El jugador distribuye un presupuesto limitado (horas, dinero, etc.) entre iniciativas con distinto valor y tope, maximizando el resultado del escenario. |
-| **Activa tu idea** | Reto de innovación | Ante un problema real del campus, el jugador elige entre 4 posibles soluciones cuál ataca la causa raíz del problema. |
-| **Latido Social** | Emparejar necesidad-acción | El jugador conecta una necesidad social con la acción comunitaria que mejor la resuelve. |
+| **ActivaTuIdea** | Reto de innovación | Ante un problema real del campus, el jugador elige entre 4 posibles soluciones cuál ataca la causa raíz del problema. |
+| **LatidoSocial** | Emparejar necesidad-acción | El jugador conecta una necesidad social con la acción comunitaria que mejor la resuelve. |
 
 Todos los minijuegos comparten: barra de progreso por pregunta, temporizador, pantalla de resultados al finalizar y desbloqueo de una **insignia** (`BadgeSystem`) persistida en `localStorage` la primera vez que se completan.
 
@@ -294,10 +295,10 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 
 | Captura | Descripción |
 | --- | --- |
-| ![Landing page](docs/evidencias/landing-hero.png) | Hero de la landing page, con el contador global de insignias y el acceso al mapa de islas. |
-| ![Mapa de islas](docs/evidencias/landing-island-map.png) | Mapa de islas: Comunicarte completada parcialmente, NeuroMath desbloqueada, VoxCivitas y Gerencia+ aún bloqueadas (🔒). |
-| ![Llegada a una isla](docs/evidencias/island-arrival.png) | Isla de Comunicarte: portal, personaje guía, palmeras, antorcha y océano animado, al atardecer. |
-| ![Minijuego dentro de una isla](docs/evidencias/island-minigame.png) | Minijuego de Comunicarte ("Ordena la frase") abierto sobre el fondo 3D de su isla. |
+| ![Hero de la landing](docs/evidencias/landing-hero.png) | Hero de la landing page, con el wordmark, el patrón de puntos/diamantes y el contador global de insignias — misma paleta y tipografía que la landing real de UNIMINUTO. |
+| ![Tarjetas de competencias / islas](docs/evidencias/landing-cards.png) | Sección "Potenciamos tu desarrollo integral": ComunicArte completada (borde dorado), NeuroMath desbloqueada, el resto con candado. |
+| ![Llegada a una isla](docs/evidencias/island-arrival.png) | Isla de ComunicArte: portal, personaje guía, palmeras, antorcha y océano animado, al atardecer. |
+| ![Minijuego dentro de una isla](docs/evidencias/island-minigame.png) | Minijuego de ComunicArte ("Ordena la frase") abierto sobre el fondo 3D de su isla. |
 | ![Panel de insignias](docs/evidencias/island-badges.png) | Panel de insignias (2/12 desbloqueadas) abierto desde dentro de una isla. |
 
 ---

@@ -5,6 +5,9 @@ export const ZONE_TRIGGER_RADIUS = 4;
 
 /**
  * Las 6 líneas transversales, en el orden fijo en que aparecen como islas en la landing page.
+ * Nombres, colores y descripciones replican los de la landing page real de VirtuXperience
+ * (uniminuto.edu/virtuxperience-home), para que la marca sea consistente entre la landing y el
+ * mundo 3D de cada isla (el portal, el personaje y el monumento usan el mismo `color`).
  * Cada una se desbloquea al completar la insignia de "primera ronda" de la anterior (la primera
  * siempre está abierta). `angleDeg` ya no ubica un portal en un hub compartido: Character.ts lo usa
  * solo para decidir de qué lado del portal se para el personaje dentro de su propia isla.
@@ -12,9 +15,9 @@ export const ZONE_TRIGGER_RADIUS = 4;
 export const ZONES: ZoneDefinition[] = [
   {
     id: "comunicarte",
-    name: "Comunicarte",
-    description: "Lectura, escritura, oralidad y multilingüismo.",
-    color: "#2FA5D8",
+    name: "ComunicArte",
+    description: "Desarrolla tu pensamiento crítico y comunica con propósito.",
+    color: "#6ABCCC",
     angleDeg: 0,
     minigameSceneId: "comunicarte-sentence",
     npcGreeting: "¡Hola! ¿Listo para ordenar unas frases conmigo?",
@@ -24,8 +27,8 @@ export const ZONES: ZoneDefinition[] = [
   {
     id: "neuromath",
     name: "NeuroMath",
-    description: "Pensamiento matemático y resolución de problemas.",
-    color: "#7A4FE0",
+    description: "Estimula tu mente. Fortalece tu pensamiento lógico y matemático.",
+    color: "#F54F17",
     angleDeg: 60,
     minigameSceneId: "neuromath-arcade",
     npcGreeting: "Dibuja tus respuestas a mano: yo aprendo a reconocerlas.",
@@ -34,9 +37,9 @@ export const ZONES: ZoneDefinition[] = [
   },
   {
     id: "voxcivitas",
-    name: "VoxCivitas",
-    description: "Ciudadanía y participación.",
-    color: "#E0A22F",
+    name: "Voxcivitas",
+    description: "Desarrolla autonomía, proyecto de vida y ciudadanía.",
+    color: "#EEE61C",
     angleDeg: 120,
     minigameSceneId: "voxcivitas-dilemas",
     npcGreeting: "En una comunidad, cada decisión cuenta. ¿Qué harías tú?",
@@ -46,8 +49,8 @@ export const ZONES: ZoneDefinition[] = [
   {
     id: "gerencia-plus",
     name: "Gerencia+",
-    description: "Gestión y desempeño profesional.",
-    color: "#2FE07A",
+    description: "Lidera con propósito, crece con confianza.",
+    color: "#3887D1",
     angleDeg: 180,
     minigameSceneId: "gerencia-recursos",
     npcGreeting: "Los recursos son limitados. Repártelos con cabeza.",
@@ -56,9 +59,9 @@ export const ZONES: ZoneDefinition[] = [
   },
   {
     id: "activa-tu-idea",
-    name: "Activa tu idea",
-    description: "Innovación y desarrollo de ideas.",
-    color: "#E05C2F",
+    name: "ActivaTuIdea",
+    description: "Convierte tu creatividad en proyectos reales.",
+    color: "#F84F44",
     angleDeg: 240,
     minigameSceneId: "activa-tu-idea-inventos",
     npcGreeting: "Toda gran idea empieza con un problema bien entendido.",
@@ -67,9 +70,9 @@ export const ZONES: ZoneDefinition[] = [
   },
   {
     id: "latido-social",
-    name: "Latido Social",
-    description: "Dimensión social y compromiso con el entorno.",
-    color: "#E02F5C",
+    name: "LatidoSocial",
+    description: "¡Aquí se vibra con el corazón del impacto social!",
+    color: "#639A44",
     angleDeg: 300,
     minigameSceneId: "latido-social-cadena",
     npcGreeting: "Conectemos cada necesidad con la acción que la atiende.",

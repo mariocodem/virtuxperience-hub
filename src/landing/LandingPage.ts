@@ -3,17 +3,13 @@ import { BADGE_CATALOG, BadgeSystem } from "../systems/BadgeSystem";
 import type { ZoneDefinition } from "../types/zone";
 
 /**
- * Landing page de entrada (inspirada en la de VirtuXperience de UNIMINUTO: cabecera institucional +
- * presentación de las 6 líneas transversales) con el mapa de islas tipo videojuego como pieza central:
- * cada isla es una línea transversal: se recorren en orden y la insignia de "primera ronda" de una
- * desbloquea la entrada a la siguiente.
+ * Landing page de entrada: réplica cercana de la landing real de VirtuXperience de UNIMINUTO
+ * (uniminuto.edu/virtuxperience-home) — misma paleta (azul marino, dorado, teal), misma tipografía
+ * (Lato), mismo wordmark en el hero con patrón de puntos y diamantes, misma sección "Potenciamos tu
+ * desarrollo integral" con sus 6 tarjetas de competencias (colores y textos tomados de la página real).
+ * La diferencia: aquí esa misma grilla de tarjetas ES el punto de entrada a las islas — cada una se
+ * desbloquea al completar la insignia de "primera ronda" de la anterior.
  */
-
-const NODE_GAP = 230;
-const TOP_PADDING = 110;
-const BOTTOM_PADDING = 150;
-/** Posición horizontal (0-100) de cada isla a lo largo del camino: alterna lado con un leve zigzag. */
-const NODE_X = [22, 70, 30, 76, 24, 68];
 
 export type IslandSelectHandler = (zone: ZoneDefinition, index: number) => void;
 
@@ -24,9 +20,24 @@ export function isIslandUnlocked(index: number): boolean {
   return prevBadge ? BadgeSystem.isUnlocked(prevBadge) : true;
 }
 
+/** Un ícono de línea simple por competencia, en el espíritu del de la página real (no una copia de su arte). */
+const ICONS: Record<string, string> = {
+  comunicarte: `<path d="M8 15a6 6 0 0 1 6-6h20a6 6 0 0 1 6 6v9a6 6 0 0 1-6 6H21l-8 6v-6.3A6 6 0 0 1 8 24z"/><path d="M16 19.5c1.6 2 4 3 8 3s6.4-1 8-3"/><circle cx="33" cy="11" r="1.8" fill="currentColor" stroke="none"/>`,
+  neuromath: `<circle cx="22" cy="19" r="11"/><path d="M22 8a11 11 0 0 1 0 22"/><path d="M15 32h14l-2 6H17z"/><path d="M16 17l4 5 5-7 5 4"/>`,
+  voxcivitas: `<path d="M24 36S8 27 8 16.5A7.5 7.5 0 0 1 24 14a7.5 7.5 0 0 1 16 2.5C40 27 24 36 24 36z"/>`,
+  "gerencia-plus": `<rect x="6" y="16" width="18" height="18" rx="2"/><rect x="22" y="6" width="18" height="18" rx="2"/><circle cx="38" cy="9" r="1.8" fill="currentColor" stroke="none"/><circle cx="9" cy="31" r="1.8" fill="currentColor" stroke="none"/>`,
+  "activa-tu-idea": `<path d="M24 6a12 12 0 0 0-7 21.8c1.3 1 2 2.5 2 4.2v1h10v-1c0-1.7.7-3.2 2-4.2A12 12 0 0 0 24 6z"/><path d="M19 38h10M21 42h6"/><path d="M24 14v3M18 19l2 1.3M30 19l-2 1.3"/>`,
+  "latido-social": `<circle cx="17" cy="13" r="4.5"/><circle cx="31" cy="13" r="4.5"/><path d="M8 37v-6a9 9 0 0 1 9-9h0a9 9 0 0 1 6 2.3"/><path d="M40 37v-6a9 9 0 0 0-9-9h0a9 9 0 0 0-6 2.3"/><path d="M8 30l6-6 4 4 6-7 4 4 6-6"/>`,
+};
+
+function iconSvg(zoneId: string): string {
+  const paths = ICONS[zoneId] ?? `<circle cx="24" cy="24" r="14"/>`;
+  return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+}
+
 export class LandingPage {
   private readonly root: HTMLDivElement;
-  private readonly mapSection: HTMLElement;
+  private readonly cardsGrid: HTMLDivElement;
   private readonly badgeCounterEl: HTMLSpanElement;
   private selectHandler: IslandSelectHandler = () => undefined;
 
@@ -37,38 +48,62 @@ export class LandingPage {
     const topbar = document.createElement("header");
     topbar.className = "landing-topbar";
     topbar.innerHTML = `
-      <span class="landing-brand">UNIMINUTO <strong>Virtual</strong></span>
+      <div class="landing-brand">
+        <span class="landing-brand-mark" aria-hidden="true"></span>
+        <span class="landing-brand-text">UNIMINUTO <strong>Virtual</strong></span>
+      </div>
       <span class="landing-badge-counter" id="landing-badge-counter"></span>
     `;
 
     const hero = document.createElement("section");
     hero.className = "landing-hero";
     hero.innerHTML = `
-      <p class="landing-eyebrow">VirtuXperience</p>
-      <h1>Un ecosistema virtual inmersivo para tu desarrollo integral</h1>
-      <p class="landing-lead">
-        Seis islas, seis líneas transversales. Explora cada una en primera persona, con tecnología
-        WebXR, y desbloquea la siguiente completando los retos de la anterior.
-      </p>
-      <a class="landing-cta" href="#island-map">Explorar las islas ↓</a>
+      <div class="landing-hero-dots" aria-hidden="true"></div>
+      <div class="landing-hero-diamond landing-hero-diamond--a" aria-hidden="true"></div>
+      <div class="landing-hero-diamond landing-hero-diamond--b" aria-hidden="true"></div>
+      <div class="landing-hero-inner">
+        <p class="landing-eyebrow">UNIMINUTO Virtual</p>
+        <h1 class="landing-wordmark">Virtu<span class="landing-wordmark-x">X</span>perience</h1>
+        <p class="landing-lead">
+          Un entorno virtual con recursos dinámicos e interactivos: seis líneas transversales, seis
+          islas en primera persona con tecnología WebXR.
+        </p>
+        <a class="landing-cta" href="#competencias">Explorar las islas →</a>
+      </div>
     `;
 
     const intro = document.createElement("section");
     intro.className = "landing-intro";
     intro.innerHTML = `
-      <h2>Potenciamos tu desarrollo integral</h2>
-      <p>Cada isla es un mundo 3D independiente con su propio minijuego, personaje guía e insignias.</p>
+      <p class="landing-intro-eyebrow">VirtuXperience</p>
+      <span class="landing-intro-rule" aria-hidden="true"></span>
+      <p class="landing-intro-text">
+        Es un entorno virtual con recursos digitales dinámicos e interactivos complementarios, que
+        busca fomentar el aprendizaje experiencial, la flexibilidad de acceso, y el desarrollo integral
+        de competencias declaradas en el perfil profesional como aporte académico y social para tu
+        permanencia. Cada línea es una isla: entra, resuelve su reto y desbloquea la siguiente.
+      </p>
     `;
 
-    this.mapSection = document.createElement("section");
-    this.mapSection.className = "island-map";
-    this.mapSection.id = "island-map";
+    const competencias = document.createElement("section");
+    competencias.className = "landing-competencias";
+    competencias.id = "competencias";
+    competencias.innerHTML = `
+      <p class="landing-section-eyebrow">Competencias</p>
+      <h2 class="landing-section-heading">Potenciamos tu desarrollo integral</h2>
+    `;
+    this.cardsGrid = document.createElement("div");
+    this.cardsGrid.className = "landing-cards";
+    competencias.appendChild(this.cardsGrid);
 
     const footer = document.createElement("footer");
     footer.className = "landing-footer";
-    footer.textContent = "VirtuXperience Hub — prueba técnica UNIMINUTO Virtual. 100% cliente web, sin backend.";
+    footer.innerHTML = `
+      <p>VirtuXperience Hub — prueba técnica inspirada en VirtuXperience de UNIMINUTO Virtual.</p>
+      <p class="landing-footer-fine">100% cliente web, sin backend. No es un sitio oficial de UNIMINUTO.</p>
+    `;
 
-    this.root.append(topbar, hero, intro, this.mapSection, footer);
+    this.root.append(topbar, hero, intro, competencias, footer);
     container.appendChild(this.root);
 
     this.badgeCounterEl = topbar.querySelector("#landing-badge-counter") as HTMLSpanElement;
@@ -87,71 +122,69 @@ export class LandingPage {
     this.root.style.display = "none";
   }
 
-  /** Reconstruye el mapa de islas leyendo el estado actual de insignias (llamar cada vez que se vuelve a mostrar). */
+  /** Reconstruye la grilla de islas leyendo el estado actual de insignias (llamar cada vez que se vuelve a mostrar). */
   render(): void {
     const unlockedBadges = new Set(BadgeSystem.getUnlocked());
     this.badgeCounterEl.textContent = `🏅 ${unlockedBadges.size} / ${BADGE_CATALOG.length}`;
-
-    const mapHeight = TOP_PADDING + (ZONES.length - 1) * NODE_GAP + BOTTOM_PADDING;
-    this.mapSection.style.height = `${mapHeight}px`;
-    this.mapSection.innerHTML = "";
-
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("class", "island-map-path");
-    svg.setAttribute("viewBox", `0 0 100 ${mapHeight}`);
-    svg.setAttribute("preserveAspectRatio", "none");
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", buildPathD(mapHeight));
-    svg.appendChild(path);
-    this.mapSection.appendChild(svg);
+    this.cardsGrid.innerHTML = "";
 
     ZONES.forEach((zone, index) => {
       const unlocked = isIslandUnlocked(index);
       const zoneBadges = BADGE_CATALOG.filter((b) => b.zone === zone.name);
       const completedCount = zoneBadges.filter((b) => unlockedBadges.has(b.id)).length;
-      const justCompleted = completedCount === zoneBadges.length && zoneBadges.length > 0;
+      const completed = completedCount === zoneBadges.length && zoneBadges.length > 0;
 
-      const node = document.createElement("button");
-      node.type = "button";
-      node.className = `island-node${unlocked ? " unlocked" : ""}${justCompleted ? " completed" : ""}`;
-      node.style.left = `${NODE_X[index % NODE_X.length]}%`;
-      node.style.top = `${TOP_PADDING + index * NODE_GAP}px`;
-      node.style.setProperty("--island-color", zone.color);
-      node.style.setProperty("--island-delay", `${index * 0.4}s`);
+      const card = document.createElement("div");
+      card.className = `landing-card${unlocked ? " unlocked" : ""}${completed ? " completed" : ""}`;
+      card.style.setProperty("--zone-color", zone.color);
 
-      node.innerHTML = `
-        <span class="island-node-number">${index + 1}</span>
-        <span class="island-node-icon">${zone.icon ?? "🏝️"}</span>
-        <span class="island-node-name">${zone.name}</span>
-        <span class="island-node-desc">${zone.description}</span>
-        <span class="island-node-progress">${completedCount} / ${zoneBadges.length} insignias</span>
-        <span class="island-node-lock" aria-hidden="true">🔒</span>
-      `;
+      const number = document.createElement("span");
+      number.className = "landing-card-number";
+      number.textContent = String(index + 1);
 
-      node.addEventListener("click", () => {
+      const iconWrap = document.createElement("div");
+      iconWrap.className = "landing-card-icon";
+      iconWrap.innerHTML = iconSvg(zone.id);
+
+      const title = document.createElement("h3");
+      title.className = "landing-card-title";
+      title.textContent = zone.name;
+
+      const desc = document.createElement("p");
+      desc.className = "landing-card-desc";
+      desc.textContent = zone.description;
+
+      const progress = document.createElement("span");
+      progress.className = "landing-card-progress";
+      progress.textContent = `${completedCount} / ${zoneBadges.length} insignias`;
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "landing-card-button";
+      button.textContent = unlocked ? "Entrar" : "Bloqueada";
+
+      const lock = document.createElement("div");
+      lock.className = "landing-card-lock";
+      lock.setAttribute("aria-hidden", "true");
+      lock.textContent = "🔒";
+
+      card.append(number, iconWrap, title, desc, progress, button, lock);
+
+      const activate = (): void => {
         if (!unlocked) {
-          node.classList.add("shake");
-          node.addEventListener("animationend", () => node.classList.remove("shake"), { once: true });
+          card.classList.add("shake");
+          card.addEventListener("animationend", () => card.classList.remove("shake"), { once: true });
           return;
         }
         this.selectHandler(zone, index);
+      };
+      card.addEventListener("click", activate);
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        activate();
       });
 
-      this.mapSection.appendChild(node);
+      this.cardsGrid.appendChild(card);
     });
   }
-}
-
-/** Camino curvo (serie de curvas Q) que conecta el centro de cada isla, en el mismo sistema de coordenadas del viewBox. */
-function buildPathD(mapHeight: number): string {
-  const points = ZONES.map((_, i) => ({ x: NODE_X[i % NODE_X.length], y: TOP_PADDING + i * NODE_GAP }));
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 1; i < points.length; i++) {
-    const prev = points[i - 1];
-    const curr = points[i];
-    const midY = (prev.y + curr.y) / 2;
-    d += ` C ${prev.x} ${midY}, ${curr.x} ${midY}, ${curr.x} ${curr.y}`;
-  }
-  void mapHeight;
-  return d;
 }
