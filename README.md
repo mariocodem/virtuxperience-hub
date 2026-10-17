@@ -28,7 +28,7 @@
 
 **Flujo de la aplicación:**
 
-1. El usuario llega a una **landing page** (`src/landing/LandingPage.ts`) con una cabecera y un hero inspirados en la página real de VirtuXperience de UNIMINUTO, seguidos de un **mapa de islas** tipo videojuego (al estilo del mapa de niveles de Duolingo/Candy Crush): las 6 líneas transversales dibujadas como islas conectadas por un camino, con candado 🔒 en las que aún no se pueden jugar.
+1. El usuario llega a una **landing page** (`src/landing/LandingPage.ts`) con un hero y un índice de las 6 líneas transversales, cada una funcionando como entrada a su isla: bloqueada hasta que se completa la anterior.
 2. Solo la primera isla empieza desbloqueada. Completar la insignia de "primera ronda" de una isla desbloquea la siguiente — así se fuerza un recorrido en orden por las 6 líneas transversales.
 3. Al hacer clic en una isla desbloqueada, la aplicación construye **un mundo 3D en primera persona independiente para esa isla** (césped, playa, océano animado, portal y personaje guía) con tecnología WebXR, donde el jugador camina hasta el portal y resuelve el **minijuego educativo** de esa línea.
 4. Un botón "🗺️ Mapa de islas" (o la tecla `Esc`) devuelve en cualquier momento a la landing page, que refleja el progreso actualizado.
@@ -216,22 +216,18 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 
 ## Funcionalidades desarrolladas
 
-### Landing page: réplica cercana de la de UNIMINUTO
-Construida mirando directamente la landing real de VirtuXperience (`uniminuto.edu/virtuxperience-home`) en un navegador y muestreando sus colores por píxel — no solo "inspirada", sino con la misma estructura de dos filas de cabecera, el mismo hero, la misma sección de competencias y un footer con la misma rejilla:
-- **Cabecera de dos filas**, como la real: fila superior (marca + utilidades + botón dorado de CTA) y fila de navegación (enlaces de menú + un botón "píldora" morada con brillo cian, en el lugar de su "Haz tu donación").
-- **Hero**: mismo wordmark "VirtuXperience" con la X dorada, mismo patrón de puntos y diamantes girando sobre el gradiente azul marino → teal.
-- **Sección "VirtuXperience"**: mismo título dorado con regla punteada, en un layout de dos columnas junto a una vista previa.
-- **"Competencias" → "Potenciamos tu desarrollo integral"**: la misma grilla de 6 tarjetas — colores de ícono y textos (nombre, frase) tomados de la página real.
-- **Footer** con la misma rejilla de columnas sobre fondo azul marino y una fila final de insignias.
-- **Esa grilla de 6 tarjetas de competencias es, además, el mapa de islas**: cada tarjeta lleva un número de orden, su insignia de progreso (`X / 2`) y un botón "Entrar"/"Bloqueada". Hacer clic en una tarjeta bloqueada la hace vibrar en vez de entrar. La primera isla siempre está desbloqueada; cada siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior.
-- El contador de insignias de la cabecera y el estado de cada tarjeta se recalculan cada vez que se vuelve a la landing page (p. ej. justo después de ganar una insignia).
-- **Un solo sistema de íconos de línea propio** (trazo 1.8, sin rellenos, sin emoji) recorre toda la página — utilidades de la cabecera, candado de las islas bloqueadas, contador de insignias, enlaces del footer.
-- **Revelado en cascada**: las 6 tarjetas aparecen con una leve animación escalonada al llegar a la vista (en vez de aparecer todas de golpe), el único momento de entrada orquestado de la página.
+### Landing page: un solo motivo, la paleta real de UNIMINUTO
+Rediseñada alrededor de una sola idea geométrica: el aspa que forma la "X" de "VirtuXperience" es, en esencia, un cuadrado girado 45° — un chaflán. Ese único corte gobierna toda la página (la tarima del hero, el marco de la captura real, los botones, las muescas de color del índice de islas y la marca grande del footer), sobre la paleta y tipografía reales de UNIMINUTO (azul marino, dorado, Lato):
+- **Cabecera de una sola fila**: marca, enlace al índice y botón de CTA dorado — sin menús decorativos que no llevan a ningún sitio.
+- **Hero**: wordmark "VirtuXperience" (la X en dorado) sobre fondo azul marino plano, junto a un panel achaflanado con una captura real de una isla del juego, revelada con una animación de obturador al cargar.
+- **Índice de las 6 islas**: no es una grilla de tarjetas, es una lista tipográfica — numeral de orden, muesca de diamante con el color real de cada línea, nombre, descripción, progreso de insignias (`X / 2`) y "Entrar"/"Bloqueada". Clic en una fila bloqueada la hace vibrar en vez de entrar. La primera isla siempre está desbloqueada; cada siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior.
+- El contador de insignias de la cabecera y el estado de cada fila se recalculan cada vez que se vuelve a la landing page (p. ej. justo después de ganar una insignia).
+- **Footer**: la marca "VirtuXperience Hub" construida grande sobre el motivo de diamantes, con columnas de enlaces reales del proyecto en vez de certificaciones institucionales que no aplican.
+- **Revelado al hacer scroll**: cada sección aparece con una leve transición al entrar en la vista; sin movimiento para quien pide `prefers-reduced-motion`.
 
-**Tres cosas de la página real no se reproducen, a propósito, aunque el layout las reserve:**
-- La fotografía de la estudiante del hero es de una persona real → se sustituye por una ilustración propia (SVG) en el mismo lugar y composición.
-- El botón "Haz tu donación" y el video de YouTube no tienen equivalente real en este proyecto → el botón pasa a mostrar el contador de insignias con el mismo estilo, y el video se sustituye por una captura real de una isla del juego, en el mismo layout de dos columnas.
-- El footer institucional (certificaciones ISO/IQNET, logos de ~9 organizaciones aliadas, direcciones y avisos legales de UNIMINUTO) no se reproduce con esos datos, porque no son de este proyecto → se mantiene la misma rejilla de columnas sobre fondo azul marino, con contenido real (enlaces al repositorio, al README, y las tecnologías usadas en vez de certificaciones).
+**Dos cosas de la página real de UNIMINUTO no se reproducen, a propósito:**
+- La fotografía de la estudiante del hero es de una persona real → en su lugar, el hero usa una captura real del propio juego.
+- El footer institucional (certificaciones ISO/IQNET, logos de organizaciones aliadas, direcciones y avisos legales de UNIMINUTO) no se reproduce con esos datos, porque no son de este proyecto → se mantiene el mismo lenguaje visual (la marca construida grande), con contenido real de este proyecto.
 
 ### Cada isla: un mundo 3D independiente
 - Al entrar a una isla desbloqueada, la aplicación construye su propio mundo en primera persona (WASD + mouse look con pointer lock): un islote con césped al centro, playa de arena alrededor y océano animado hasta el horizonte, con un muro invisible que mantiene al jugador en tierra.
@@ -305,9 +301,9 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 
 | Captura | Descripción |
 | --- | --- |
-| ![Cabecera y hero de la landing](docs/evidencias/landing-hero.png) | Cabecera de dos filas, wordmark con patrón de puntos/diamantes e ilustración propia (no la foto real), y la sección "VirtuXperience" con la vista previa del juego. |
-| ![Tarjetas de competencias / islas](docs/evidencias/landing-cards.png) | Sección "Potenciamos tu desarrollo integral": ComunicArte completada (borde dorado), NeuroMath desbloqueada, el resto con candado. |
-| ![Footer de la landing](docs/evidencias/landing-footer.png) | Footer con la misma rejilla de columnas de la página real, con contenido propio de este proyecto. |
+| ![Cabecera y hero de la landing](docs/evidencias/landing-hero.png) | Cabecera de una fila y hero con el wordmark "VirtuXperience", sobre fondo azul marino plano, junto al panel achaflanado con la captura real de una isla. |
+| ![Índice de las 6 islas](docs/evidencias/landing-index.png) | Índice tipográfico de las 6 líneas: ComunicArte desbloqueada, el resto con "Bloqueada" hasta completar la anterior. |
+| ![Footer de la landing](docs/evidencias/landing-footer.png) | Footer con la marca "VirtuXperience Hub" construida grande sobre el motivo de diamantes, y columnas con contenido propio de este proyecto. |
 | ![Llegada a una isla](docs/evidencias/island-arrival.png) | Isla de ComunicArte: portal, personaje guía, palmeras, antorcha y océano animado, al atardecer. |
 | ![Minijuego dentro de una isla](docs/evidencias/island-minigame.png) | Minijuego de ComunicArte ("Ordena la frase") abierto sobre el fondo 3D de su isla. |
 | ![Panel de insignias](docs/evidencias/island-badges.png) | Panel de insignias (2/12 desbloqueadas) abierto desde dentro de una isla. |

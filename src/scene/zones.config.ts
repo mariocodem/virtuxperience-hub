@@ -21,7 +21,6 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 0,
     minigameSceneId: "comunicarte-sentence",
     npcGreeting: "¡Hola! ¿Listo para ordenar unas frases conmigo?",
-    icon: "💬",
     firstRoundBadgeId: "comunicarte-primera-ronda",
   },
   {
@@ -32,7 +31,6 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 60,
     minigameSceneId: "neuromath-arcade",
     npcGreeting: "Dibuja tus respuestas a mano: yo aprendo a reconocerlas.",
-    icon: "🧮",
     firstRoundBadgeId: "neuromath-primera-ronda",
   },
   {
@@ -43,7 +41,6 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 120,
     minigameSceneId: "voxcivitas-dilemas",
     npcGreeting: "En una comunidad, cada decisión cuenta. ¿Qué harías tú?",
-    icon: "🏛️",
     firstRoundBadgeId: "voxcivitas-primera-ronda",
   },
   {
@@ -54,7 +51,6 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 180,
     minigameSceneId: "gerencia-recursos",
     npcGreeting: "Los recursos son limitados. Repártelos con cabeza.",
-    icon: "💼",
     firstRoundBadgeId: "gerencia-primera-ronda",
   },
   {
@@ -65,7 +61,6 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 240,
     minigameSceneId: "activa-tu-idea-inventos",
     npcGreeting: "Toda gran idea empieza con un problema bien entendido.",
-    icon: "💡",
     firstRoundBadgeId: "activaidea-primera-ronda",
   },
   {
@@ -76,7 +71,6 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 300,
     minigameSceneId: "latido-social-cadena",
     npcGreeting: "Conectemos cada necesidad con la acción que la atiende.",
-    icon: "❤️",
     firstRoundBadgeId: "latido-social-primera-ronda",
   },
 ];

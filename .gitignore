@@ -11,3 +11,7 @@ dist
 .agents/
 .impeccable/
 skills-lock.json
+
+# Estado local del skill de diseño "taste" (dirección dealt + capturas de inspect.mjs): tampoco
+# es contenido del proyecto.
+.taste-skill/
