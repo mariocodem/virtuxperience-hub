@@ -323,5 +323,4 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 - **Para revisar un minijuego específico**: abrir `src/minigames/<zona>/` — cada uno es autocontenido y sigue el mismo contrato (`ZoneEnterContext`) definido en [`src/types/zone.ts`](src/types/zone.ts).
 - **Verificación de tipos**: `npx tsc --noEmit` (sin errores).
 - **Build de producción**: `npm run build` (genera `dist/` sin errores; advertencia de tamaño de chunk esperada por el peso de Babylon.js + TensorFlow.js, no es un error).
-- **No se requieren credenciales, tokens ni cuentas de terceros** para instalar, ejecutar o evaluar el proyecto.
-- Link en vercel: https://virtuxperience-hub.vercel.app/ 
+- **No se requieren credenciales, tokens ni cuentas de terceros** para instalar, ejecutar o evaluar el proyecto. 
