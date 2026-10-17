@@ -225,6 +225,8 @@ Construida mirando directamente la landing real de VirtuXperience (`uniminuto.ed
 - **Footer** con la misma rejilla de columnas sobre fondo azul marino y una fila final de insignias.
 - **Esa grilla de 6 tarjetas de competencias es, además, el mapa de islas**: cada tarjeta lleva un número de orden, su insignia de progreso (`X / 2`) y un botón "Entrar"/"Bloqueada". Hacer clic en una tarjeta bloqueada la hace vibrar en vez de entrar. La primera isla siempre está desbloqueada; cada siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior.
 - El contador de insignias de la cabecera y el estado de cada tarjeta se recalculan cada vez que se vuelve a la landing page (p. ej. justo después de ganar una insignia).
+- **Un solo sistema de íconos de línea propio** (trazo 1.8, sin rellenos, sin emoji) recorre toda la página — utilidades de la cabecera, candado de las islas bloqueadas, contador de insignias, enlaces del footer.
+- **Revelado en cascada**: las 6 tarjetas aparecen con una leve animación escalonada al llegar a la vista (en vez de aparecer todas de golpe), el único momento de entrada orquestado de la página.
 
 **Tres cosas de la página real no se reproducen, a propósito, aunque el layout las reserve:**
 - La fotografía de la estudiante del hero es de una persona real → se sustituye por una ilustración propia (SVG) en el mismo lugar y composición.

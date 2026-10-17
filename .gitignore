@@ -5,3 +5,9 @@ dist
 .claude/
 .vercel
 .env*
+
+# Caché/estado local del skill de diseño "impeccable" (librería de skills descargada + capturas
+# de inspección): no es contenido del proyecto, igual que node_modules.
+.agents/
+.impeccable/
+skills-lock.json

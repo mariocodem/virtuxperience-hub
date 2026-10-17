@@ -17,6 +17,9 @@ import type { ZoneDefinition } from "../types/zone";
  *   UNIMINUTO): se mantiene la misma estructura visual (columnas, navy, dorado) pero con contenido
  *   real de este proyecto, no certificaciones o entidades que no son suyas.
  *
+ * Un solo sistema de íconos de línea propio (sin emoji) recorre toda la página: mismo grosor de trazo,
+ * mismas terminaciones redondeadas, definido una sola vez en ICON_PATHS.
+ *
  * La grilla de 6 tarjetas de competencias es, además, el punto de entrada a las islas: cada una se
  * desbloquea al completar la insignia de "primera ronda" de la anterior.
  */
@@ -31,7 +34,7 @@ export function isIslandUnlocked(index: number): boolean {
 }
 
 /** Un ícono de línea simple por competencia, en el espíritu del de la página real (no una copia de su arte). */
-const ICONS: Record<string, string> = {
+const COMPETENCY_ICON_PATHS: Record<string, string> = {
   comunicarte: `<path d="M8 15a6 6 0 0 1 6-6h20a6 6 0 0 1 6 6v9a6 6 0 0 1-6 6H21l-8 6v-6.3A6 6 0 0 1 8 24z"/><path d="M16 19.5c1.6 2 4 3 8 3s6.4-1 8-3"/><circle cx="33" cy="11" r="1.8" fill="currentColor" stroke="none"/>`,
   neuromath: `<circle cx="22" cy="19" r="11"/><path d="M22 8a11 11 0 0 1 0 22"/><path d="M15 32h14l-2 6H17z"/><path d="M16 17l4 5 5-7 5 4"/>`,
   voxcivitas: `<path d="M24 36S8 27 8 16.5A7.5 7.5 0 0 1 24 14a7.5 7.5 0 0 1 16 2.5C40 27 24 36 24 36z"/>`,
@@ -40,9 +43,28 @@ const ICONS: Record<string, string> = {
   "latido-social": `<circle cx="17" cy="13" r="4.5"/><circle cx="31" cy="13" r="4.5"/><path d="M8 37v-6a9 9 0 0 1 9-9h0a9 9 0 0 1 6 2.3"/><path d="M40 37v-6a9 9 0 0 0-9-9h0a9 9 0 0 0-6 2.3"/><path d="M8 30l6-6 4 4 6-7 4 4 6-6"/>`,
 };
 
-function iconSvg(zoneId: string): string {
-  const paths = ICONS[zoneId] ?? `<circle cx="24" cy="24" r="14"/>`;
+function competencyIcon(zoneId: string): string {
+  const paths = COMPETENCY_ICON_PATHS[zoneId] ?? `<circle cx="24" cy="24" r="14"/>`;
   return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+}
+
+/**
+ * Sistema de íconos de interfaz (candado, insignia, mapa, etc.): un solo trazo (1.8), mismas
+ * terminaciones redondeadas, viewBox 0 0 24 24 — reemplaza todo emoji en la página.
+ */
+const UI_ICON_PATHS: Record<string, string> = {
+  globe: `<circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4c2.4 2.3 2.4 13.7 0 16M12 4c-2.4 2.3-2.4 13.7 0 16"/>`,
+  compass: `<circle cx="12" cy="12" r="8"/><path d="M14.3 9.7 10.3 10.3 9.7 14.3 13.7 13.7z"/>`,
+  shieldCheck: `<path d="M12 3.5 19 6.3v5c0 5-3 8.3-7 9.2-4-.9-7-4.2-7-9.2v-5z"/><path d="M8.7 12l2.2 2.2 4.4-4.4"/>`,
+  medal: `<circle cx="12" cy="8.5" r="4.5"/><path d="M9 12.3 6.8 20l5.2-2.2 5.2 2.2-2.2-7.7"/>`,
+  map: `<path d="M12 21s6.5-6.8 6.5-11A6.5 6.5 0 0 0 5.5 10c0 4.2 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.3"/>`,
+  headset: `<rect x="2.5" y="9" width="19" height="7.5" rx="3.5"/><circle cx="8" cy="12.7" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="12.7" r="1.4" fill="currentColor" stroke="none"/>`,
+  viewfinder: `<path d="M4 9V6a2 2 0 0 1 2-2h3"/><path d="M20 9V6a2 2 0 0 0-2-2h-3"/><path d="M4 15v3a2 2 0 0 0 2 2h3"/><path d="M20 15v3a2 2 0 0 1-2 2h-3"/><circle cx="12" cy="12" r="3"/>`,
+  lock: `<rect x="5" y="11" width="14" height="9" rx="2.2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>`,
+};
+
+function uiIcon(name: keyof typeof UI_ICON_PATHS): string {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${UI_ICON_PATHS[name]}</svg>`;
 }
 
 /** Ilustración propia (no una foto) de un estudiante, en el lugar donde la página real pone su fotografía. */
@@ -71,6 +93,7 @@ export class LandingPage {
   private readonly cardsGrid: HTMLDivElement;
   private readonly badgeCounterEl: HTMLSpanElement;
   private selectHandler: IslandSelectHandler = () => undefined;
+  private revealObserver: IntersectionObserver | null = null;
 
   constructor(container: HTMLElement) {
     this.root = document.createElement("div");
@@ -85,9 +108,9 @@ export class LandingPage {
           <span class="landing-brand-text">UNIMINUTO <strong>Virtual</strong></span>
         </div>
         <div class="landing-utility-links">
-          <span>📍 100% en línea</span>
-          <span>🧭 6 líneas transversales</span>
-          <span>🛡️ Sin registro</span>
+          <span class="landing-utility-item">${uiIcon("globe")}100% en línea</span>
+          <span class="landing-utility-item">${uiIcon("compass")}6 líneas transversales</span>
+          <span class="landing-utility-item">${uiIcon("shieldCheck")}Sin registro</span>
           <a class="landing-utility-cta" href="#competencias">Comenzar gratis →</a>
         </div>
       </div>
@@ -111,11 +134,10 @@ export class LandingPage {
       <div class="landing-hero-diamond landing-hero-diamond--b" aria-hidden="true"></div>
       <div class="landing-hero-grid">
         <div class="landing-hero-inner">
-          <p class="landing-eyebrow">UNIMINUTO Virtual</p>
           <h1 class="landing-wordmark">Virtu<span class="landing-wordmark-x">X</span>perience</h1>
           <p class="landing-lead">
-            Un entorno virtual con recursos dinámicos e interactivos: seis líneas transversales, seis
-            islas en primera persona con tecnología WebXR.
+            Un entorno virtual con recursos dinámicos e interactivos de UNIMINUTO Virtual: seis líneas
+            transversales, seis islas en primera persona con tecnología WebXR.
           </p>
           <a class="landing-cta" href="#competencias">Explorar las islas →</a>
         </div>
@@ -128,10 +150,10 @@ export class LandingPage {
     intro.innerHTML = `
       <div class="landing-intro-preview">
         <img src="/landing-preview.jpg" alt="Vista previa de una isla del hub" loading="lazy" />
-        <span class="landing-intro-preview-badge">🎮 Vista previa · 3D · WebXR</span>
+        <span class="landing-intro-preview-badge">${uiIcon("viewfinder")}Vista previa · 3D · WebXR</span>
       </div>
       <div class="landing-intro-copy">
-        <p class="landing-intro-eyebrow">VirtuXperience</p>
+        <h2 class="landing-intro-heading">VirtuXperience</h2>
         <span class="landing-intro-rule" aria-hidden="true"></span>
         <p class="landing-intro-text">
           Es un entorno virtual con recursos digitales dinámicos e interactivos complementarios, que
@@ -146,8 +168,8 @@ export class LandingPage {
     competencias.className = "landing-competencias";
     competencias.id = "competencias";
     competencias.innerHTML = `
-      <p class="landing-section-eyebrow">Competencias</p>
-      <h2 class="landing-section-heading">Potenciamos tu desarrollo integral</h2>
+      <h2 class="landing-section-heading">Potencia tu desarrollo integral</h2>
+      <p class="landing-section-sub">Seis competencias, seis islas. Completa la primera ronda de una para desbloquear la siguiente.</p>
     `;
     this.cardsGrid = document.createElement("div");
     this.cardsGrid.className = "landing-cards";
@@ -185,9 +207,9 @@ export class LandingPage {
         </div>
         <div class="landing-footer-col">
           <h4>Explora</h4>
-          <span>🗺️ Mapa de islas: esta página</span>
-          <span>🏅 Insignias: dentro de cada isla</span>
-          <span>🥽 Realidad aumentada (WebXR)</span>
+          <span class="landing-footer-item">${uiIcon("map")}Mapa de islas: esta página</span>
+          <span class="landing-footer-item">${uiIcon("medal")}Insignias: dentro de cada isla</span>
+          <span class="landing-footer-item">${uiIcon("headset")}Realidad aumentada (WebXR)</span>
         </div>
         <div class="landing-footer-col">
           <h4>Construido con</h4>
@@ -223,8 +245,22 @@ export class LandingPage {
   /** Reconstruye la grilla de islas leyendo el estado actual de insignias (llamar cada vez que se vuelve a mostrar). */
   render(): void {
     const unlockedBadges = new Set(BadgeSystem.getUnlocked());
-    this.badgeCounterEl.textContent = `🏅 ${unlockedBadges.size} / ${BADGE_CATALOG.length}`;
+    this.badgeCounterEl.innerHTML = `${uiIcon("medal")}${unlockedBadges.size} / ${BADGE_CATALOG.length}`;
     this.cardsGrid.innerHTML = "";
+    this.revealObserver?.disconnect();
+
+    // Momento de revelado: las tarjetas entran en cascada al llegar a la vista, en vez de aparecer de golpe.
+    this.revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+            this.revealObserver?.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
 
     ZONES.forEach((zone, index) => {
       const unlocked = isIslandUnlocked(index);
@@ -235,6 +271,7 @@ export class LandingPage {
       const card = document.createElement("div");
       card.className = `landing-card${unlocked ? " unlocked" : ""}${completed ? " completed" : ""}`;
       card.style.setProperty("--zone-color", zone.color);
+      card.style.setProperty("--reveal-delay", `${(index % 3) * 70}ms`);
 
       const number = document.createElement("span");
       number.className = "landing-card-number";
@@ -242,7 +279,7 @@ export class LandingPage {
 
       const iconWrap = document.createElement("div");
       iconWrap.className = "landing-card-icon";
-      iconWrap.innerHTML = iconSvg(zone.id);
+      iconWrap.innerHTML = competencyIcon(zone.id);
 
       const title = document.createElement("h3");
       title.className = "landing-card-title";
@@ -264,7 +301,7 @@ export class LandingPage {
       const lock = document.createElement("div");
       lock.className = "landing-card-lock";
       lock.setAttribute("aria-hidden", "true");
-      lock.textContent = "🔒";
+      lock.innerHTML = uiIcon("lock");
 
       card.append(number, iconWrap, title, desc, progress, button, lock);
 
@@ -283,6 +320,7 @@ export class LandingPage {
       });
 
       this.cardsGrid.appendChild(card);
+      this.revealObserver?.observe(card);
     });
   }
 }

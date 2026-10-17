@@ -916,6 +916,32 @@ body {
   color: #1b2a4a;
   font-family: "Lato", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  scrollbar-color: #004683 #e9edf6;
+}
+
+.landing ::selection {
+  background: #ffd300;
+  color: #0e1a3d;
+}
+
+.landing ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.landing ::-webkit-scrollbar-track {
+  background: #e9edf6;
+}
+
+.landing ::-webkit-scrollbar-thumb {
+  background: #9fb2d6;
+  border-radius: 999px;
+  border: 3px solid #e9edf6;
+}
+
+.landing a:focus-visible,
+.landing button:focus-visible {
+  outline: 2px solid #55e5f5;
+  outline-offset: 2px;
 }
 
 .landing-topbar {
@@ -967,6 +993,19 @@ body {
   white-space: nowrap;
 }
 
+.landing-utility-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.landing-utility-item svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
 .landing-utility-cta {
   padding: 7px 18px;
   border-radius: 999px;
@@ -1000,6 +1039,9 @@ body {
 }
 
 .landing-badge-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 5px 14px;
   border-radius: 999px;
   background: #ffd300;
@@ -1007,6 +1049,12 @@ body {
   font-weight: 700;
   font-size: 13px;
   white-space: nowrap;
+}
+
+.landing-badge-counter svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .landing-nav-glow {
@@ -1117,15 +1165,6 @@ body {
   }
 }
 
-.landing-eyebrow {
-  margin: 0 0 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 12px;
-  font-weight: 700;
-  color: #55e5f5;
-}
-
 .landing-wordmark {
   margin: 0 0 20px;
   font-size: clamp(40px, 7vw, 64px);
@@ -1199,6 +1238,9 @@ body {
   position: absolute;
   left: 14px;
   bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 14px;
   border-radius: 999px;
   background: rgba(14, 26, 61, 0.85);
@@ -1207,11 +1249,17 @@ body {
   font-weight: 700;
 }
 
+.landing-intro-preview-badge svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .landing-intro-copy {
   text-align: left;
 }
 
-.landing-intro-eyebrow {
+.landing-intro-heading {
   margin: 0;
   font-size: 32px;
   font-weight: 900;
@@ -1254,21 +1302,22 @@ body {
   margin: 0 auto;
   padding: 20px 24px 80px;
   text-align: center;
-}
-
-.landing-section-eyebrow {
-  margin: 0 0 6px;
-  color: #004683;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.04em;
+  /* La cabecera es sticky (~96px): sin esto, llegar aquí por #competencias (el CTA del hero) deja el
+     título tapado detrás de ella. */
+  scroll-margin-top: 110px;
 }
 
 .landing-section-heading {
-  margin: 0 0 48px;
+  margin: 0 0 12px;
   font-size: clamp(26px, 4vw, 34px);
   font-weight: 900;
   color: #004683;
+}
+
+.landing-section-sub {
+  margin: 0 0 48px;
+  color: #51628a;
+  font-size: 16px;
 }
 
 .landing-cards {
@@ -1288,14 +1337,28 @@ body {
   border: 1px solid rgba(27, 42, 74, 0.08);
   box-shadow: 0 10px 30px rgba(16, 32, 72, 0.08);
   cursor: pointer;
-  transition: transform 0.18s, box-shadow 0.18s;
+  transition: transform 0.18s, box-shadow 0.18s, opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s;
+  /* Momento de revelado: la tarjeta entra en cascada al llegar a la vista (ver IntersectionObserver en LandingPage.ts). */
+  opacity: 0;
+  transform: translateY(18px);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.landing-card.revealed {
   opacity: 0.55;
-  filter: grayscale(0.5);
+  transform: translateY(0);
 }
 
 .landing-card.unlocked {
-  opacity: 1;
   filter: none;
+}
+
+.landing-card.revealed.unlocked {
+  opacity: 1;
+}
+
+.landing-card:not(.unlocked) {
+  filter: grayscale(0.5);
 }
 
 .landing-card.unlocked:hover {
@@ -1393,7 +1456,12 @@ body {
   justify-content: center;
   border-radius: 18px;
   background: rgba(240, 242, 248, 0.82);
-  font-size: 30px;
+  color: #7c879f;
+}
+
+.landing-card-lock svg {
+  width: 30px;
+  height: 30px;
 }
 
 .landing-card:not(.unlocked) .landing-card-lock {
@@ -1470,6 +1538,19 @@ body {
 }
 
 .landing-footer-col a:hover {
+  color: #55e5f5;
+}
+
+.landing-footer-col .landing-footer-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-footer-item svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
   color: #55e5f5;
 }
 
