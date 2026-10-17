@@ -5,9 +5,19 @@ import type { ZoneDefinition } from "../types/zone";
 /**
  * Landing page de entrada: réplica cercana de la landing real de VirtuXperience de UNIMINUTO
  * (uniminuto.edu/virtuxperience-home) — misma paleta (azul marino, dorado, teal), misma tipografía
- * (Lato), mismo wordmark en el hero con patrón de puntos y diamantes, misma sección "Potenciamos tu
- * desarrollo integral" con sus 6 tarjetas de competencias (colores y textos tomados de la página real).
- * La diferencia: aquí esa misma grilla de tarjetas ES el punto de entrada a las islas — cada una se
+ * (Lato), mismas dos filas de cabecera, mismo hero con wordmark + patrón de puntos + diamantes, misma
+ * sección "Potenciamos tu desarrollo integral" con sus 6 tarjetas, y un footer con la misma estructura.
+ *
+ * Tres cosas de la página real NO se reproducen, a propósito:
+ * - La fotografía de la estudiante del hero: es de una persona real: se sustituye por una ilustración
+ *   propia en el mismo lugar y composición.
+ * - El botón "Haz tu donación" y el video de YouTube: no hay donaciones ni video propios; se sustituyen
+ *   por una acción real de esta app y por una vista previa real del juego, en el mismo layout.
+ * - El footer institucional (certificaciones, logos de organizaciones aliadas, avisos legales de
+ *   UNIMINUTO): se mantiene la misma estructura visual (columnas, navy, dorado) pero con contenido
+ *   real de este proyecto, no certificaciones o entidades que no son suyas.
+ *
+ * La grilla de 6 tarjetas de competencias es, además, el punto de entrada a las islas: cada una se
  * desbloquea al completar la insignia de "primera ronda" de la anterior.
  */
 
@@ -35,6 +45,27 @@ function iconSvg(zoneId: string): string {
   return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 }
 
+/** Ilustración propia (no una foto) de un estudiante, en el lugar donde la página real pone su fotografía. */
+const HERO_ILLUSTRATION = `
+<svg viewBox="0 0 220 320" class="landing-hero-figure" aria-hidden="true">
+  <ellipse cx="110" cy="300" rx="70" ry="14" fill="#06102a" opacity="0.4"/>
+  <path d="M40 300v-70c0-44 31-80 70-80s70 36 70 80v70z" fill="#0f2742"/>
+  <path d="M55 170c8-14 18-22 30-22h50c16 0 28 14 28 32v18H55z" fill="#55e5f5" opacity="0.9"/>
+  <rect x="50" y="178" width="18" height="60" rx="6" fill="#1c8f85"/>
+  <rect x="150" y="178" width="18" height="60" rx="6" fill="#1c8f85"/>
+  <circle cx="110" cy="92" r="46" fill="#ffd9ad"/>
+  <path d="M64 88c0-28 20-50 46-50s46 22 46 50c-10-10-26-16-46-16s-36 6-46 16z" fill="#2a1b12"/>
+  <path d="M70 84c10-6 24-9 40-9s30 3 40 9" stroke="#2a1b12" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <circle cx="90" cy="96" r="12" fill="none" stroke="#0f2742" stroke-width="4"/>
+  <circle cx="130" cy="96" r="12" fill="none" stroke="#0f2742" stroke-width="4"/>
+  <line x1="102" y1="96" x2="118" y2="96" stroke="#0f2742" stroke-width="4"/>
+  <path d="M86 112q24 14 48 0" stroke="#7a4a2a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <rect x="86" y="226" width="48" height="60" rx="6" fill="#ffd300"/>
+  <rect x="92" y="236" width="36" height="4" rx="2" fill="#0f2742" opacity="0.5"/>
+  <rect x="92" y="246" width="36" height="4" rx="2" fill="#0f2742" opacity="0.5"/>
+  <rect x="92" y="256" width="24" height="4" rx="2" fill="#0f2742" opacity="0.5"/>
+</svg>`;
+
 export class LandingPage {
   private readonly root: HTMLDivElement;
   private readonly cardsGrid: HTMLDivElement;
@@ -48,11 +79,28 @@ export class LandingPage {
     const topbar = document.createElement("header");
     topbar.className = "landing-topbar";
     topbar.innerHTML = `
-      <div class="landing-brand">
-        <span class="landing-brand-mark" aria-hidden="true"></span>
-        <span class="landing-brand-text">UNIMINUTO <strong>Virtual</strong></span>
+      <div class="landing-utility-row">
+        <div class="landing-brand">
+          <span class="landing-brand-mark" aria-hidden="true"></span>
+          <span class="landing-brand-text">UNIMINUTO <strong>Virtual</strong></span>
+        </div>
+        <div class="landing-utility-links">
+          <span>📍 100% en línea</span>
+          <span>🧭 6 líneas transversales</span>
+          <span>🛡️ Sin registro</span>
+          <a class="landing-utility-cta" href="#competencias">Comenzar gratis →</a>
+        </div>
       </div>
-      <span class="landing-badge-counter" id="landing-badge-counter"></span>
+      <nav class="landing-nav-row">
+        <div class="landing-nav-links">
+          <span>Sistema Uniminuto ▾</span>
+          <span>Conoce nuestra oferta académica ▾</span>
+          <span>Vida universitaria ▾</span>
+          <span>Portal I+D+I+C</span>
+          <span>Proyección social ▾</span>
+        </div>
+        <span class="landing-badge-counter landing-nav-glow" id="landing-badge-counter"></span>
+      </nav>
     `;
 
     const hero = document.createElement("section");
@@ -61,28 +109,37 @@ export class LandingPage {
       <div class="landing-hero-dots" aria-hidden="true"></div>
       <div class="landing-hero-diamond landing-hero-diamond--a" aria-hidden="true"></div>
       <div class="landing-hero-diamond landing-hero-diamond--b" aria-hidden="true"></div>
-      <div class="landing-hero-inner">
-        <p class="landing-eyebrow">UNIMINUTO Virtual</p>
-        <h1 class="landing-wordmark">Virtu<span class="landing-wordmark-x">X</span>perience</h1>
-        <p class="landing-lead">
-          Un entorno virtual con recursos dinámicos e interactivos: seis líneas transversales, seis
-          islas en primera persona con tecnología WebXR.
-        </p>
-        <a class="landing-cta" href="#competencias">Explorar las islas →</a>
+      <div class="landing-hero-grid">
+        <div class="landing-hero-inner">
+          <p class="landing-eyebrow">UNIMINUTO Virtual</p>
+          <h1 class="landing-wordmark">Virtu<span class="landing-wordmark-x">X</span>perience</h1>
+          <p class="landing-lead">
+            Un entorno virtual con recursos dinámicos e interactivos: seis líneas transversales, seis
+            islas en primera persona con tecnología WebXR.
+          </p>
+          <a class="landing-cta" href="#competencias">Explorar las islas →</a>
+        </div>
+        <div class="landing-hero-figure-wrap">${HERO_ILLUSTRATION}</div>
       </div>
     `;
 
     const intro = document.createElement("section");
     intro.className = "landing-intro";
     intro.innerHTML = `
-      <p class="landing-intro-eyebrow">VirtuXperience</p>
-      <span class="landing-intro-rule" aria-hidden="true"></span>
-      <p class="landing-intro-text">
-        Es un entorno virtual con recursos digitales dinámicos e interactivos complementarios, que
-        busca fomentar el aprendizaje experiencial, la flexibilidad de acceso, y el desarrollo integral
-        de competencias declaradas en el perfil profesional como aporte académico y social para tu
-        permanencia. Cada línea es una isla: entra, resuelve su reto y desbloquea la siguiente.
-      </p>
+      <div class="landing-intro-preview">
+        <img src="/landing-preview.jpg" alt="Vista previa de una isla del hub" loading="lazy" />
+        <span class="landing-intro-preview-badge">🎮 Vista previa · 3D · WebXR</span>
+      </div>
+      <div class="landing-intro-copy">
+        <p class="landing-intro-eyebrow">VirtuXperience</p>
+        <span class="landing-intro-rule" aria-hidden="true"></span>
+        <p class="landing-intro-text">
+          Es un entorno virtual con recursos digitales dinámicos e interactivos complementarios, que
+          busca fomentar el aprendizaje experiencial, la flexibilidad de acceso, y el desarrollo integral
+          de competencias declaradas en el perfil profesional como aporte académico y social para tu
+          permanencia. Cada línea es una isla: entra, resuelve su reto y desbloquea la siguiente.
+        </p>
+      </div>
     `;
 
     const competencias = document.createElement("section");
@@ -96,17 +153,58 @@ export class LandingPage {
     this.cardsGrid.className = "landing-cards";
     competencias.appendChild(this.cardsGrid);
 
-    const footer = document.createElement("footer");
-    footer.className = "landing-footer";
-    footer.innerHTML = `
-      <p>VirtuXperience Hub — prueba técnica inspirada en VirtuXperience de UNIMINUTO Virtual.</p>
-      <p class="landing-footer-fine">100% cliente web, sin backend. No es un sitio oficial de UNIMINUTO.</p>
-    `;
+    const footer = this.buildFooter();
 
     this.root.append(topbar, hero, intro, competencias, footer);
     container.appendChild(this.root);
 
     this.badgeCounterEl = topbar.querySelector("#landing-badge-counter") as HTMLSpanElement;
+  }
+
+  private buildFooter(): HTMLElement {
+    const footer = document.createElement("footer");
+    footer.className = "landing-footer";
+    footer.innerHTML = `
+      <div class="landing-footer-grid">
+        <div class="landing-footer-col landing-footer-brand">
+          <div class="landing-brand">
+            <span class="landing-brand-mark" aria-hidden="true"></span>
+            <span class="landing-brand-text">VirtuXperience <strong>Hub</strong></span>
+          </div>
+          <p>
+            Ecosistema virtual inmersivo (WebXR/3D): un hub de islas navegable en primera persona, cada
+            una con su minijuego educativo. Prueba técnica inspirada en VirtuXperience de UNIMINUTO
+            Virtual.
+          </p>
+        </div>
+        <div class="landing-footer-col">
+          <h4>Proyecto</h4>
+          <a href="#competencias">Las 6 islas</a>
+          <a href="https://github.com/mariocodem/virtuxperience-hub" target="_blank" rel="noopener noreferrer">Código fuente</a>
+          <a href="https://github.com/mariocodem/virtuxperience-hub#readme" target="_blank" rel="noopener noreferrer">Documentación (README)</a>
+        </div>
+        <div class="landing-footer-col">
+          <h4>Explora</h4>
+          <span>🗺️ Mapa de islas: esta página</span>
+          <span>🏅 Insignias: dentro de cada isla</span>
+          <span>🥽 Realidad aumentada (WebXR)</span>
+        </div>
+        <div class="landing-footer-col">
+          <h4>Construido con</h4>
+          <div class="landing-footer-badges">
+            <span>Babylon.js</span>
+            <span>TypeScript</span>
+            <span>WebXR</span>
+            <span>TensorFlow.js</span>
+          </div>
+        </div>
+      </div>
+      <div class="landing-footer-bottom">
+        <p>VirtuXperience Hub © 2026 — Prueba técnica inspirada en VirtuXperience de UNIMINUTO Virtual.</p>
+        <p class="landing-footer-fine">No es un sitio oficial de UNIMINUTO. 100% cliente web, sin backend.</p>
+      </div>
+    `;
+    return footer;
   }
 
   onIslandSelect(handler: IslandSelectHandler): void {

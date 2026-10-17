@@ -217,11 +217,19 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 ## Funcionalidades desarrolladas
 
 ### Landing page: réplica cercana de la de UNIMINUTO
-- Construida mirando directamente la landing real de VirtuXperience (`uniminuto.edu/virtuxperience-home`): misma paleta (azul marino `#0e1a3d`, dorado `#ffd300`, teal de acento), misma tipografía (Lato, vía Google Fonts), mismo wordmark "VirtuXperience" con patrón de puntos y diamantes en el hero, y la misma sección "Competencias → Potenciamos tu desarrollo integral" con sus 6 tarjetas — colores de ícono y textos (nombre, frase) tomados de la página real.
-- **Esa misma grilla de tarjetas es el mapa de islas**: cada tarjeta lleva un número de orden, un ícono propio por línea, su insignia de progreso (`X / 2`) y un botón "Entrar"/"Bloqueada". Hacer clic en una tarjeta bloqueada la hace vibrar en vez de entrar.
-- **Progresión por insignias**: la primera isla siempre está desbloqueada; cada siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior.
+Construida mirando directamente la landing real de VirtuXperience (`uniminuto.edu/virtuxperience-home`) en un navegador y muestreando sus colores por píxel — no solo "inspirada", sino con la misma estructura de dos filas de cabecera, el mismo hero, la misma sección de competencias y un footer con la misma rejilla:
+- **Cabecera de dos filas**, como la real: fila superior (marca + utilidades + botón dorado de CTA) y fila de navegación (enlaces de menú + un botón "píldora" morada con brillo cian, en el lugar de su "Haz tu donación").
+- **Hero**: mismo wordmark "VirtuXperience" con la X dorada, mismo patrón de puntos y diamantes girando sobre el gradiente azul marino → teal.
+- **Sección "VirtuXperience"**: mismo título dorado con regla punteada, en un layout de dos columnas junto a una vista previa.
+- **"Competencias" → "Potenciamos tu desarrollo integral"**: la misma grilla de 6 tarjetas — colores de ícono y textos (nombre, frase) tomados de la página real.
+- **Footer** con la misma rejilla de columnas sobre fondo azul marino y una fila final de insignias.
+- **Esa grilla de 6 tarjetas de competencias es, además, el mapa de islas**: cada tarjeta lleva un número de orden, su insignia de progreso (`X / 2`) y un botón "Entrar"/"Bloqueada". Hacer clic en una tarjeta bloqueada la hace vibrar en vez de entrar. La primera isla siempre está desbloqueada; cada siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior.
 - El contador de insignias de la cabecera y el estado de cada tarjeta se recalculan cada vez que se vuelve a la landing page (p. ej. justo después de ganar una insignia).
-- No reproduce el menú institucional completo (mega-menús, donaciones, footer con decenas de enlaces y logos) ni la fotografía de la página real: eso es contenido/branding propio de UNIMINUTO ajeno al alcance de esta prueba técnica.
+
+**Tres cosas de la página real no se reproducen, a propósito, aunque el layout las reserve:**
+- La fotografía de la estudiante del hero es de una persona real → se sustituye por una ilustración propia (SVG) en el mismo lugar y composición.
+- El botón "Haz tu donación" y el video de YouTube no tienen equivalente real en este proyecto → el botón pasa a mostrar el contador de insignias con el mismo estilo, y el video se sustituye por una captura real de una isla del juego, en el mismo layout de dos columnas.
+- El footer institucional (certificaciones ISO/IQNET, logos de ~9 organizaciones aliadas, direcciones y avisos legales de UNIMINUTO) no se reproduce con esos datos, porque no son de este proyecto → se mantiene la misma rejilla de columnas sobre fondo azul marino, con contenido real (enlaces al repositorio, al README, y las tecnologías usadas en vez de certificaciones).
 
 ### Cada isla: un mundo 3D independiente
 - Al entrar a una isla desbloqueada, la aplicación construye su propio mundo en primera persona (WASD + mouse look con pointer lock): un islote con césped al centro, playa de arena alrededor y océano animado hasta el horizonte, con un muro invisible que mantiene al jugador en tierra.
@@ -295,8 +303,9 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 
 | Captura | Descripción |
 | --- | --- |
-| ![Hero de la landing](docs/evidencias/landing-hero.png) | Hero de la landing page, con el wordmark, el patrón de puntos/diamantes y el contador global de insignias — misma paleta y tipografía que la landing real de UNIMINUTO. |
+| ![Cabecera y hero de la landing](docs/evidencias/landing-hero.png) | Cabecera de dos filas, wordmark con patrón de puntos/diamantes e ilustración propia (no la foto real), y la sección "VirtuXperience" con la vista previa del juego. |
 | ![Tarjetas de competencias / islas](docs/evidencias/landing-cards.png) | Sección "Potenciamos tu desarrollo integral": ComunicArte completada (borde dorado), NeuroMath desbloqueada, el resto con candado. |
+| ![Footer de la landing](docs/evidencias/landing-footer.png) | Footer con la misma rejilla de columnas de la página real, con contenido propio de este proyecto. |
 | ![Llegada a una isla](docs/evidencias/island-arrival.png) | Isla de ComunicArte: portal, personaje guía, palmeras, antorcha y océano animado, al atardecer. |
 | ![Minijuego dentro de una isla](docs/evidencias/island-minigame.png) | Minijuego de ComunicArte ("Ordena la frase") abierto sobre el fondo 3D de su isla. |
 | ![Panel de insignias](docs/evidencias/island-badges.png) | Panel de insignias (2/12 desbloqueadas) abierto desde dentro de una isla. |
