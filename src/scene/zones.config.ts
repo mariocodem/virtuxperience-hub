@@ -1,8 +1,14 @@
 import type { ZoneDefinition, ZoneEnterHandler } from "../types/zone";
 
-export const HUB_RADIUS = 25;
+/** Radio de activación del portal: a esta distancia aparece "Presiona E para entrar". */
 export const ZONE_TRIGGER_RADIUS = 4;
 
+/**
+ * Las 6 líneas transversales, en el orden fijo en que aparecen como islas en la landing page.
+ * Cada una se desbloquea al completar la insignia de "primera ronda" de la anterior (la primera
+ * siempre está abierta). `angleDeg` ya no ubica un portal en un hub compartido: Character.ts lo usa
+ * solo para decidir de qué lado del portal se para el personaje dentro de su propia isla.
+ */
 export const ZONES: ZoneDefinition[] = [
   {
     id: "comunicarte",
@@ -12,6 +18,8 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 0,
     minigameSceneId: "comunicarte-sentence",
     npcGreeting: "¡Hola! ¿Listo para ordenar unas frases conmigo?",
+    icon: "💬",
+    firstRoundBadgeId: "comunicarte-primera-ronda",
   },
   {
     id: "neuromath",
@@ -21,6 +29,8 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 60,
     minigameSceneId: "neuromath-arcade",
     npcGreeting: "Dibuja tus respuestas a mano: yo aprendo a reconocerlas.",
+    icon: "🧮",
+    firstRoundBadgeId: "neuromath-primera-ronda",
   },
   {
     id: "voxcivitas",
@@ -30,6 +40,8 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 120,
     minigameSceneId: "voxcivitas-dilemas",
     npcGreeting: "En una comunidad, cada decisión cuenta. ¿Qué harías tú?",
+    icon: "🏛️",
+    firstRoundBadgeId: "voxcivitas-primera-ronda",
   },
   {
     id: "gerencia-plus",
@@ -39,6 +51,8 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 180,
     minigameSceneId: "gerencia-recursos",
     npcGreeting: "Los recursos son limitados. Repártelos con cabeza.",
+    icon: "💼",
+    firstRoundBadgeId: "gerencia-primera-ronda",
   },
   {
     id: "activa-tu-idea",
@@ -48,6 +62,8 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 240,
     minigameSceneId: "activa-tu-idea-inventos",
     npcGreeting: "Toda gran idea empieza con un problema bien entendido.",
+    icon: "💡",
+    firstRoundBadgeId: "activaidea-primera-ronda",
   },
   {
     id: "latido-social",
@@ -57,6 +73,8 @@ export const ZONES: ZoneDefinition[] = [
     angleDeg: 300,
     minigameSceneId: "latido-social-cadena",
     npcGreeting: "Conectemos cada necesidad con la acción que la atiende.",
+    icon: "❤️",
+    firstRoundBadgeId: "latido-social-primera-ronda",
   },
 ];
 

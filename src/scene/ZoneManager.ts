@@ -1,5 +1,5 @@
 import { Scene, ShadowGenerator, TransformNode, Vector3 } from "@babylonjs/core";
-import { HUB_RADIUS, ZONE_TRIGGER_RADIUS, ZONES, zoneHandlers } from "./zones.config";
+import { ZONE_TRIGGER_RADIUS, zoneHandlers } from "./zones.config";
 import { createZonePortal, ZonePortalHandle } from "./ZonePortal";
 import { createZoneCharacter, ZoneCharacterHandle } from "./Character";
 import type { ZoneDefinition, ZoneEnterContext } from "../types/zone";
@@ -7,6 +7,17 @@ import { NarrativeSystem } from "../systems/NarrativeSystem";
 
 export type ZoneRangeListener = (zone: ZoneDefinition, inRange: boolean) => void;
 
+/** Una zona a instanciar, con la posición local (relativa al `root` que se le pase al manager) de su portal. */
+export interface PlacedZone {
+  zone: ZoneDefinition;
+  position: Vector3;
+}
+
+/**
+ * Crea el portal y el personaje de cada zona que se le indique, y detecta cuándo el jugador entra/sale
+ * de su radio. No asume ningún layout concreto (ni el antiguo círculo de 6 portales ni una isla): quien
+ * construye la escena decide cuántas zonas hay y dónde va cada una.
+ */
 export class ZoneManager {
   readonly portals: ZonePortalHandle[] = [];
   private readonly characters: ZoneCharacterHandle[] = [];
@@ -14,11 +25,9 @@ export class ZoneManager {
   private readonly rangeListeners: ZoneRangeListener[] = [];
   private greetingsHidden = false;
 
-  constructor(private readonly scene: Scene, hubRoot: TransformNode, shadowGenerator: ShadowGenerator) {
-    ZONES.forEach((zone, index) => {
-      const rad = (zone.angleDeg * Math.PI) / 180;
-      const localPosition = new Vector3(Math.sin(rad) * HUB_RADIUS, 0, Math.cos(rad) * HUB_RADIUS);
-      const portal = createZonePortal(scene, hubRoot, zone, localPosition);
+  constructor(private readonly scene: Scene, root: TransformNode, shadowGenerator: ShadowGenerator, placedZones: PlacedZone[]) {
+    placedZones.forEach(({ zone, position }, index) => {
+      const portal = createZonePortal(scene, root, zone, position);
       const character = createZoneCharacter(scene, portal.root, zone, index);
       this.portals.push(portal);
       this.characters.push(character);
@@ -39,7 +48,7 @@ export class ZoneManager {
     this.portals.forEach((portal) => portal.setEffectsEnabled(enabled));
   }
 
-  /** Portal más cercano al jugador (índice en ZONES y distancia en metros). */
+  /** Portal más cercano al jugador (índice de creación y distancia en metros). */
   getNearestPortal(playerPosition: Vector3): { index: number; distance: number } {
     let index = -1;
     let distance = Infinity;
@@ -84,7 +93,7 @@ export class ZoneManager {
   getZoneInRange(): ZoneDefinition | undefined {
     for (const [id, inRange] of this.inRangeState) {
       if (inRange) {
-        return ZONES.find((zone) => zone.id === id);
+        return this.portals.find((portal) => portal.zone.id === id)?.zone;
       }
     }
     return undefined;

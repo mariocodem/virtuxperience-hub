@@ -9,6 +9,10 @@ export interface ZoneDefinition {
   minigameSceneId?: string;
   /** Frase que el personaje de la zona dice al acercarse. */
   npcGreeting?: string;
+  /** Emoji que representa la isla en el mapa de la landing page. */
+  icon?: string;
+  /** Id de la insignia de "primera ronda" de esta zona: completarla desbloquea la siguiente isla. */
+  firstRoundBadgeId?: string;
 }
 
 export interface ZoneEnterContext {

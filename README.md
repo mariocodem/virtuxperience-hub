@@ -1,6 +1,6 @@
 # VirtuXperience Hub — Prueba Técnica
 
-> Ecosistema virtual inmersivo (WebXR/3D) para UNIMINUTO Virtual: un hub navegable en primera persona desde el que se accede a 6 minijuegos educativos, cada uno alineado a una línea transversal de competencias.
+> Ecosistema virtual inmersivo (WebXR/3D) para UNIMINUTO Virtual: una landing page institucional con un **mapa de islas** tipo videojuego — una por línea transversal — que se desbloquean en orden a medida que se completan insignias. Cada isla desbloqueada se abre como su propio **mundo 3D en primera persona** con tecnología WebXR y su minijuego educativo.
 
 **Demo en vivo:** **<https://virtuxperience-hub.vercel.app>** — se abre directo en el navegador (PC o celular), sin instalar nada. También se puede ejecutar en local siguiendo la sección [Instalación y ejecución](#instalación-y-ejecución). El proyecto no requiere backend ni cuenta externa.
 
@@ -26,9 +26,14 @@
 
 **VirtuXperience Hub** es la implementación técnica de la iniciativa VirtuXperience de UNIMINUTO Virtual (ver contexto pedagógico completo en [`docs/CONTEXTO-PEDAGOGICO.md`](docs/CONTEXTO-PEDAGOGICO.md)).
 
-La aplicación es un **cliente web 3D** construido con [Babylon.js](https://www.babylonjs.com/) que renderiza una plaza central desde la que el usuario, en primera persona, puede caminar hacia 6 portales luminosos. Cada portal representa una línea transversal de competencias y, al entrar en su radio, abre un **minijuego educativo independiente** con su propia interfaz, lógica y sistema de retroalimentación.
+**Flujo de la aplicación:**
 
-El proyecto también incluye una capa experimental de **realidad aumentada vía WebXR** (`immersive-ar`) para dispositivos con soporte ARCore/ARKit, que permite colocar el hub sobre una superficie real detectada por la cámara del celular.
+1. El usuario llega a una **landing page** (`src/landing/LandingPage.ts`) con una cabecera y un hero inspirados en la página real de VirtuXperience de UNIMINUTO, seguidos de un **mapa de islas** tipo videojuego (al estilo del mapa de niveles de Duolingo/Candy Crush): las 6 líneas transversales dibujadas como islas conectadas por un camino, con candado 🔒 en las que aún no se pueden jugar.
+2. Solo la primera isla empieza desbloqueada. Completar la insignia de "primera ronda" de una isla desbloquea la siguiente — así se fuerza un recorrido en orden por las 6 líneas transversales.
+3. Al hacer clic en una isla desbloqueada, la aplicación construye **un mundo 3D en primera persona independiente para esa isla** (césped, playa, océano animado, portal y personaje guía) con tecnología WebXR, donde el jugador camina hasta el portal y resuelve el **minijuego educativo** de esa línea.
+4. Un botón "🗺️ Mapa de islas" (o la tecla `Esc`) devuelve en cualquier momento a la landing page, que refleja el progreso actualizado.
+
+El proyecto también incluye una capa experimental de **realidad aumentada vía WebXR** (`immersive-ar`) para dispositivos con soporte ARCore/ARKit, que permite colocar la isla activa sobre una superficie real detectada por la cámara del celular.
 
 ---
 
@@ -37,7 +42,7 @@ El proyecto también incluye una capa experimental de **realidad aumentada vía 
 | Categoría | Herramienta | Uso en el proyecto |
 | --- | --- | --- |
 | Lenguaje | TypeScript 5 (`strict` mode) | Todo el código fuente |
-| Motor 3D | [Babylon.js](https://www.babylonjs.com/) 8 (`core`, `gui`, `loaders`, `materials`) | Escena 3D, cámara, colisiones, materiales PBR, sombras con PCF, `ReflectionProbe` para luz ambiente, pipeline de post-proceso (bloom, tone mapping ACES, viñeta), glow layer, sistemas de partículas |
+| Motor 3D | [Babylon.js](https://www.babylonjs.com/) 8 (`core`, `gui`, `loaders`, `materials`) | Escena 3D, cámara, colisiones, materiales PBR, sombras con PCF, `ReflectionProbe` para luz ambiente, tone mapping ACES + viñeta + FXAA, `GlowLayer`, sistemas de partículas |
 | Audio | Web Audio API | Ambiente, pasos y efectos sintetizados por código (sin archivos de sonido) |
 | Gráficos procedurales | Canvas 2D + GLSL propio | Texturas de césped/adoquín/piedra con mapas de normales y shader de cielo de atardecer (sin imágenes externas) |
 | Machine Learning en navegador | [TensorFlow.js](https://www.tensorflow.org/js) 4 | Red neuronal entrenada en el propio cliente para reconocer dígitos dibujados a mano (minijuego NeuroMath) |
@@ -115,21 +120,24 @@ Proyecto-inmersivo/
 │   ├── CONTEXTO-PEDAGOGICO.md  # Descripción pedagógica/estratégica de VirtuXperience
 │   └── evidencias/             # Capturas de pantalla de la solución funcionando
 └── src/
-    ├── main.ts                 # Bootstrap: orquesta escena, jugador, HUD, zonas y XR
-    ├── style.css                # Estilos globales de la UI (HTML overlay sobre el canvas)
+    ├── main.ts                 # Bootstrap: ciclo de vida landing ↔ isla, HUD, zonas y XR
+    ├── style.css                # Estilos globales: landing page, mapa de islas y UI de los minijuegos
+    ├── vite-env.d.ts            # Tipos de Vite (import.meta.env)
+    ├── landing/
+    │   └── LandingPage.ts       # Hero institucional + mapa de islas (candados, progreso, clic para entrar)
     ├── core/
-    │   └── Game.ts              # Motor Babylon.js: Engine + Scene + loop de render
+    │   └── Game.ts              # Motor Babylon.js: un único Engine persistente + Scene recreable por isla
     ├── scene/
-    │   ├── Hub.ts                # Construye terreno, plaza, caminos, monumento central y muros
-    │   ├── Environment.ts        # Luces, sombras, reflejos del cielo, niebla, glow y post-proceso
+    │   ├── Island.ts             # Construye el mundo de una isla: césped, playa, océano animado y muro
+    │   ├── Environment.ts        # Luces, sombras, reflejos del cielo, niebla, glow, tone mapping y viñeta
     │   ├── Sky.ts                # Shader de cielo de atardecer (gradiente, sol, estrellas)
     │   ├── Scenery.ts            # Bosque, farolas, bancas, colinas lejanas y luciérnagas (instanciados)
-    │   ├── ProceduralTextures.ts # Texturas y mapas de normales generados con Canvas 2D
+    │   ├── ProceduralTextures.ts # Texturas y mapas de normales generados con Canvas 2D (césped/arena/agua/piedra)
     │   ├── PlayerController.ts   # Movimiento WASD + mouse look, pasos y balanceo de cabeza
-    │   ├── ZoneManager.ts        # Detección de proximidad del jugador a cada zona
-    │   ├── ZonePortal.ts         # Portal luminoso de cada zona (baliza, aros, chispas)
-    │   ├── Character.ts          # Personajes humanoides: miran al jugador, saludan y hablan
-    │   └── zones.config.ts       # Definición declarativa de las 6 zonas (posición, color, minijuego, saludo)
+    │   ├── ZoneManager.ts        # Detección de proximidad del jugador al portal de la isla
+    │   ├── ZonePortal.ts         # Portal luminoso de la isla (baliza, aros, chispas)
+    │   ├── Character.ts          # Personaje humanoide: mira al jugador, saluda y habla
+    │   └── zones.config.ts       # Definición declarativa de las 6 líneas (orden, color, minijuego, saludo, insignia)
     ├── minigames/                # Un subdirectorio por línea transversal (ver detalle abajo)
     │   ├── neuromath/
     │   ├── comunicarte/
@@ -158,44 +166,49 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 ## Arquitectura de la solución
 
 ```text
+                 ┌───────────────────────────┐
+                 │          main.ts           │  bootstrap: arranca en la landing
+                 └──────────────┬──────────────┘
+                                │
+                 ┌──────────────▼──────────────┐
+                 │   landing/LandingPage.ts     │  hero + mapa de islas
+                 │  (lee BadgeSystem → candados)│
+                 └──────────────┬──────────────┘
+                                │ clic en isla desbloqueada
+                                ▼
+                 ┌──────────────────────────────┐
+                 │   core/Game (Engine único)    │  game.resetScene() por cada
+                 │   + scene/Island.ts           │  entrada/salida de isla
+                 │   + PlayerController + XR     │
+                 └──────────────┬───────────────┘
+                                │ proximidad + tecla E
+                                ▼
+                    ┌───────────────────────┐
+                    │  zones.config.ts       │  6 ZoneDefinition en orden
+                    │  (color, minigameId,   │
+                    │  firstRoundBadgeId)    │
+                    └───────────┬───────────┘
+                                ▼
                  ┌─────────────────────────┐
-                 │        main.ts          │  bootstrap
+                 │ minigames/<zona>Game.ts  │  lógica + puntaje
                  └────────────┬────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                      │
-        ▼                     ▼                      ▼
-┌───────────────┐   ┌──────────────────┐   ┌──────────────────┐
-│  core/Game     │   │  scene/Hub +     │   │  xr/setupXR       │
-│  (Engine/Scene │   │  PlayerController│   │  (WebXR immersive-│
-│  + render loop)│   │  + ZoneManager   │   │  ar, hit-test)     │
-└───────────────┘   └────────┬─────────┘   └──────────────────┘
-                              │ proximidad + tecla E
-                              ▼
-                    ┌───────────────────┐
-                    │  zones.config.ts   │  6 ZoneDefinition
-                    │  (id, color, ángulo│
-                    │  minigameSceneId)  │
-                    └─────────┬─────────┘
-                              ▼
-                 ┌────────────────────────┐
-                 │ minigames/<zona>Game.ts │  lógica + puntaje
-                 └───────────┬────────────┘
-                              ▼
-                 ┌────────────────────────┐
-                 │  ui/<Zona>HUD.ts        │  overlay HTML/CSS
-                 └───────────┬────────────┘
-                              ▼
-                 ┌────────────────────────┐
-                 │ systems/BadgeSystem     │  localStorage
-                 └────────────────────────┘
+                                ▼
+                 ┌─────────────────────────┐
+                 │  ui/<Zona>HUD.ts         │  overlay HTML/CSS
+                 └────────────┬────────────┘
+                                ▼
+                 ┌─────────────────────────┐
+                 │ systems/BadgeSystem      │  localStorage → desbloquea
+                 └─────────────────────────┘     la siguiente isla
 ```
 
 **Principios de diseño:**
 
-- **Escena única, minijuegos desacoplados**: no hay recarga de página ni cambio de escena Babylon.js al entrar a un minijuego. `ZoneManager` congela el movimiento del jugador (`freezeMovement`) y el minijuego monta su propio overlay HTML sobre `ui-root`, con un `onExit` para devolver el control al hub.
-- **Configuración declarativa de zonas**: agregar una nueva línea transversal es agregar una entrada a `zones.config.ts` y registrar su handler; el hub, el HUD de proximidad y la detección de colisión no requieren cambios.
-- **UI como overlay HTML, no como GUI 3D**: cada minijuego (`ui/*HUD.ts`) es una capa DOM independiente del canvas de Babylon.js, lo que permite estilos CSS normales, mejor accesibilidad y reutilización del mismo patrón en los 6 minijuegos.
+- **Un Engine, muchas escenas**: el contexto WebGL (`Engine`) se crea una sola vez y se reutiliza durante toda la sesión; cada entrada a una isla llama a `Game.resetScene()`, que descarta por completo la escena anterior (geometría, materiales, texturas, luces, partículas) y crea una nueva vacía. Recrear el `Engine` en cada visita (en vez de la `Scene`) se probó primero y resultó frágil: el navegador libera el contexto WebGL de forma asíncrona y compite con la creación del siguiente. Ver [`core/Game.ts`](src/core/Game.ts).
+- **Islas desacopladas entre sí**: `scene/Island.ts` construye un mundo completo y autocontenido (terreno, océano, portal, personaje) a partir de una sola `ZoneDefinition`; no sabe nada de las otras 5 islas ni de la landing page.
+- **Progresión declarativa**: cada `ZoneDefinition` en `zones.config.ts` lleva su `firstRoundBadgeId`; `LandingPage.isIslandUnlocked(index)` solo consulta si la insignia de la isla anterior ya está en `BadgeSystem`. Añadir una isla nueva es añadir una entrada a ese arreglo.
+- **Minijuegos desacoplados de la escena**: dentro de una isla, no hay recarga de página ni cambio de escena al entrar a su minijuego. `ZoneManager` congela el movimiento del jugador (`freezeMovement`) y el minijuego monta su propio overlay HTML sobre `ui-root`, con un `onExit` para devolver el control a la isla.
+- **UI como overlay HTML, no como GUI 3D**: tanto la landing page como cada minijuego (`ui/*HUD.ts`) son capas DOM independientes del canvas de Babylon.js, lo que permite estilos CSS normales, mejor accesibilidad y reutilización del mismo patrón.
 - **Compatibilidad dual escritorio/XR**: `ZoneManager.update()` recibe la posición del jugador desde `PlayerController` (modo escritorio, WASD + pointer lock) o desde la cámara WebXR (`arCamera.globalPosition`, modo RA), sin duplicar la lógica de detección de zonas.
 - **ML embebido sin backend**: el reconocimiento de escritura de NeuroMath entrena un modelo pequeño con TensorFlow.js directamente en el navegador al cargar la app (`digitModel.ts`), sin llamadas a un servicio externo de inferencia.
 
@@ -203,20 +216,27 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 
 ## Funcionalidades desarrolladas
 
-### Hub central
-- Navegación en primera persona (WASD + mouse look con pointer lock).
-- Parque al atardecer: plaza empedrada con un monumento hexagonal (una banda luminosa por línea transversal), 6 caminos de losas hacia los portales, bancas, farolas, bosque y colinas en el horizonte.
-- Cada portal es una baliza con haz de luz, aros giratorios y chispas, en el color de su zona, con un personaje a su lado.
-- Detección de proximidad con aviso en pantalla ("Presiona E para entrar") y entrada por tecla `E`.
+### Landing page y mapa de islas
+- Cabecera y hero inspirados en la landing real de VirtuXperience (UNIMINUTO Virtual): título, descripción y llamado a la acción que baja hasta el mapa.
+- **Mapa de islas tipo videojuego**: las 6 líneas transversales como nodos conectados por un camino punteado sobre un fondo de atardecer/océano, cada uno con ícono, nombre, descripción corta y contador de insignias (`X / 2`).
+- **Progresión por insignias**: la primera isla siempre está desbloqueada; cada una siguiente se desbloquea al completar la insignia de "primera ronda" de la anterior. Una isla bloqueada muestra 🔒 y, si se le hace clic, vibra en vez de entrar.
+- El contador de insignias de la cabecera y el estado de cada isla se recalculan cada vez que se vuelve a la landing page (p. ej. justo después de ganar una insignia).
+
+### Cada isla: un mundo 3D independiente
+- Al entrar a una isla desbloqueada, la aplicación construye su propio mundo en primera persona (WASD + mouse look con pointer lock): un islote con césped al centro, playa de arena alrededor y océano animado hasta el horizonte, con un muro invisible que mantiene al jugador en tierra.
+- El portal de la isla es una baliza con haz de luz, aros giratorios y chispas, en el color de su línea transversal, con un personaje guía al lado.
+- Decoración temática: palmeras y antorchas tiki con llama animada.
+- Detección de proximidad con aviso en pantalla ("Presiona E para entrar") y entrada por tecla `E`; un botón "🗺️ Mapa de islas" (o la tecla `Esc`) devuelve a la landing page en cualquier momento.
 
 ### Realismo visual
-- **Materiales PBR** con texturas y mapas de normales procedurales (césped, adoquín, piedra) en vez de colores planos.
-- **Iluminación coherente con el cielo**: el sol del shader de atardecer y la luz direccional apuntan al mismo lado; el cielo se captura en un `ReflectionProbe` que aporta luz ambiente y reflejos a los materiales PBR.
-- **Sombras** dinámicas (PCF) de árboles, farolas, bancas, monumento y personajes.
-- **Perspectiva atmosférica**: niebla exponencial del color del horizonte y dos capas de colinas que se funden con ella.
-- **Post-proceso**: bloom, tone mapping ACES, viñeta, grano y FXAA.
-- **Vida ambiental**: luciérnagas (partículas) y farolas que brillan con el `GlowLayer`.
-- **Personajes humanoides** (piernas, torso, brazos, cabeza, ojos y cabello) que respiran, giran el cuerpo y la cabeza hacia el jugador, saludan al acercarse y muestran un globo de diálogo propio de su línea transversal.
+- **Materiales PBR** con texturas y mapas de normales procedurales (césped, arena, agua, adoquín/piedra del zócalo del portal) en vez de colores planos.
+- **Océano animado**: un mapa de normales de oleaje se desplaza por UV cada frame, dando sensación de agua en movimiento sin geometría que se mueva.
+- **Iluminación coherente con el cielo**: el sol del shader de atardecer y la luz direccional apuntan al mismo lado; el cielo se captura en un `ReflectionProbe` que aporta luz ambiente y reflejos (visibles en el océano) a los materiales PBR.
+- **Sombras** dinámicas (PCF) de palmeras, antorchas, portal y personaje.
+- **Perspectiva atmosférica**: niebla exponencial del color del horizonte.
+- **Post-proceso**: tone mapping ACES, viñeta y FXAA vía `scene.imageProcessingConfiguration` + `FxaaPostProcess`.
+- **Vida ambiental**: antorchas con llama animada y balizas con `GlowLayer`.
+- **Personaje humanoide** (piernas, torso, brazos, cabeza, ojos y cabello) que respira, gira el cuerpo y la cabeza hacia el jugador, saluda al acercarse y muestra un globo de diálogo propio de su línea transversal.
 
 ### Inmersión
 - **Sonido procedural** (Web Audio, sin archivos): viento, grillos y un colchón grave de fondo; pasos distintos sobre piedra y pasto; un zumbido que se intensifica al acercarse a un portal (cada zona tiene su nota); y efectos para entrar/salir de una zona, acierto, error e insignia. Se silencia con `M` o con el botón 🔊 (la preferencia se guarda).
@@ -238,14 +258,14 @@ Cada minijuego sigue el mismo patrón de dos archivos:
 Todos los minijuegos comparten: barra de progreso por pregunta, temporizador, pantalla de resultados al finalizar y desbloqueo de una **insignia** (`BadgeSystem`) persistida en `localStorage` la primera vez que se completan.
 
 ### Panel de insignias
-- Botón "🏅 Insignias" visible en la esquina superior derecha del hub (clic o tecla `B`) que abre un panel con el catálogo completo de 12 insignias (dos por línea transversal: primera ronda completada y ronda perfecta).
+- Botón "🏅 Insignias" visible en la esquina superior derecha dentro de cualquier isla (clic o tecla `B`) que abre un panel con el catálogo completo de 12 insignias (dos por línea transversal: primera ronda completada y ronda perfecta).
 - Cada insignia muestra su estado — desbloqueada (🏅) o bloqueada (🔒) — junto a su nombre y descripción, con un contador de progreso (`X / 12 desbloqueadas`).
 - El estado se lee directamente de `localStorage`, por lo que persiste entre sesiones del navegador.
 
 ### Realidad aumentada (WebXR, experimental)
-- Botón de entrada a sesión `immersive-ar` cuando el navegador/dispositivo lo soporta.
-- `hit-test` contra superficies reales para colocar el hub completo sobre el suelo detectado por la cámara.
-- `dom-overlay` para mostrar la UI del hub encima del feed de la cámara durante la sesión de RA.
+- Botón de entrada a sesión `immersive-ar` cuando el navegador/dispositivo lo soporta, disponible dentro de cada isla.
+- `hit-test` contra superficies reales para colocar la isla activa sobre el suelo detectado por la cámara.
+- `dom-overlay` para mostrar la UI encima del feed de la cámara durante la sesión de RA.
 - Manejo de error visible en pantalla (`showXRError`) cuando el dispositivo no certifica ARCore/ARKit, en vez de fallar en silencio.
 
 > **Nota de alcance:** esta función depende de que el hardware del dispositivo tenga ARCore/ARKit certificado. En equipos sin esa certificación (verificado incluso contra la [demo oficial de WebXR](https://immersive-web.github.io/webxr-samples/immersive-ar-session.html), que también falla en esos dispositivos), el navegador rechaza la sesión con `NotSupportedError`. Es una limitación de hardware, no del código. La app sigue siendo completamente funcional en modo escritorio/móvil sin RA.
@@ -256,12 +276,14 @@ Todos los minijuegos comparten: barra de progreso por pregunta, temporizador, pa
 
 | Acción | Control |
 | --- | --- |
-| Moverse | `W` `A` `S` `D` |
+| Entrar a una isla desbloqueada | Clic sobre ella en el mapa de islas |
+| Moverse (dentro de una isla) | `W` `A` `S` `D` |
 | Mirar alrededor | Mouse (clic sobre el canvas activa el *pointer lock*) |
-| Entrar a una zona / minijuego | `E` (estando dentro del radio de una zona) |
+| Entrar al minijuego del portal | `E` (estando dentro de su radio) |
 | Responder / dibujar en un minijuego | Clic o touch, según el minijuego |
 | Ver insignias obtenidas | `B` o clic en el botón "🏅 Insignias" |
 | Silenciar / activar el sonido | `M` o clic en el botón 🔊 |
+| Volver al mapa de islas | `Esc` o clic en "🗺️ Mapa de islas" |
 | Entrar a RA (si el dispositivo lo soporta) | Botón de RA en pantalla |
 
 ---
@@ -272,13 +294,11 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 
 | Captura | Descripción |
 | --- | --- |
-| ![Hub central](docs/evidencias/hub-general.png?v=0676aa5) | Hub central con los portales de las 6 zonas visibles (Latido Social, Comunicarte y NeuroMath en cuadro). |
-| ![Portal y personaje](docs/evidencias/hub-portal-npc.png?v=0676aa5) | Portal de Comunicarte con su personaje saludando y su globo de diálogo, al atardecer. |
-| ![NeuroMath](docs/evidencias/neuromath-drawing.png?v=0676aa5) | Zona de NeuroMath cargando el modelo de reconocimiento de escritura antes de iniciar. |
-| ![Comunicarte](docs/evidencias/comunicarte-oracion.png?v=0676aa5) | Minijuego de Comunicarte: reconstrucción de una frase por palabras. |
-| ![Panel de insignias](docs/evidencias/insignias.png?v=0676aa5) | Panel de insignias mostrando el progreso (2/12) con estados bloqueado/desbloqueado. |
-| ![VoxCivitas](docs/evidencias/voxcivitas-dilema.png?v=0676aa5) | Minijuego de VoxCivitas: dilema ciudadano con dos opciones. |
-| ![Gerencia+](docs/evidencias/gerencia-recursos.png?v=0676aa5) | Minijuego de Gerencia+: reparto de horas entre iniciativas con presupuesto limitado. |
+| ![Landing page](docs/evidencias/landing-hero.png) | Hero de la landing page, con el contador global de insignias y el acceso al mapa de islas. |
+| ![Mapa de islas](docs/evidencias/landing-island-map.png) | Mapa de islas: Comunicarte completada parcialmente, NeuroMath desbloqueada, VoxCivitas y Gerencia+ aún bloqueadas (🔒). |
+| ![Llegada a una isla](docs/evidencias/island-arrival.png) | Isla de Comunicarte: portal, personaje guía, palmeras, antorcha y océano animado, al atardecer. |
+| ![Minijuego dentro de una isla](docs/evidencias/island-minigame.png) | Minijuego de Comunicarte ("Ordena la frase") abierto sobre el fondo 3D de su isla. |
+| ![Panel de insignias](docs/evidencias/island-badges.png) | Panel de insignias (2/12 desbloqueadas) abierto desde dentro de una isla. |
 
 ---
 
@@ -287,8 +307,10 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 - **Sin backend por diseño**: la prueba se centró en demostrar la experiencia inmersiva y la lógica de los minijuegos en el cliente. El `BadgeSystem` usa `localStorage` en vez de una base de datos porque no había un requisito de persistencia multiusuario/multisesión.
 - **RA con cámara real limitada al hardware disponible**: se evaluó una alternativa de *passthrough* de cámara vía `getUserMedia` combinada con seguimiento de manos (TensorFlow.js `hand-pose-detection`) para permitir dibujar con la mano en NeuroMath usando la cámara del computador. Se implementó y se probó, pero el modelo de detección de manos devolvía resultados numéricamente inválidos (`NaN`) en el hardware de prueba disponible incluso tras varios intentos de corrección (backend CPU, ajustes de precisión de texturas WebGL). Ante esa inestabilidad, se decidió **revertir esa función** y mantener el dibujo por mouse/touch, que es estable y no depende de la cámara. El código de RA con `hit-test` (sección anterior) sí se mantiene porque no presentó ese problema y funciona en dispositivos con ARCore/ARKit certificado.
 - **Cero assets externos**: las texturas se dibujan con Canvas 2D, el cielo es un shader y el audio se sintetiza con Web Audio. Así se conserva la ejecución 100 % estática y sin descargas; el costo es ~0,5 s extra de arranque para generar las texturas. Si más adelante se quiere un acabado fotográfico, basta con sustituir `ProceduralTextures.ts` por texturas/HDRI reales sin tocar el resto.
-- **Realismo y RA**: el terreno de 460 m, las colinas, el bosque exterior, el cielo, las luciérnagas y el post-proceso solo existen en modo escritorio. En RA el hub se reduce ~25× para colocarse sobre una superficie real y esos elementos taparían la cámara, así que se apagan al entrar a la sesión (`Environment.setOutdoorEnabled`).
+- **Sin pipeline de post-proceso dedicado (`DefaultRenderingPipeline`/bloom)**: se probó primero, pero al reconstruir la escena en cada entrada/salida de isla, su compilación interna de shaders (asíncrona) a veces competía con la de la isla siguiente. Se optó por tone mapping/viñeta directos en `scene.imageProcessingConfiguration` (sin pipeline propio) y un `FxaaPostProcess` suelto para el antialiasing: visualmente casi idéntico, sin esa fuente de inestabilidad. El brillo de balizas y antorchas lo sigue dando el `GlowLayer`, que no se vio afectado.
+- **Realismo y RA**: el océano animado, el bosque de palmeras y el GlowLayer solo están activos en modo escritorio. En RA la isla se reduce ~25× para colocarse sobre una superficie real, así que esos elementos se apagan al entrar a la sesión (`Environment.setOutdoorEnabled`).
 - **Sin rebote vertical real de la cámara**: la cámara usa gravedad y colisiones de Babylon, que corrigen cualquier cambio de altura; el balanceo al caminar se simula con cabeceos de pitch/roll aplicados de forma incremental (`PlayerController.updateWalk`).
+- **Un Engine persistente, no uno por isla**: la primera versión creaba un `Engine` de Babylon.js nuevo en cada entrada/salida de isla; el navegador libera el contexto WebGL anterior de forma asíncrona, y crear uno nuevo en el mismo `<canvas>` demasiado rápido fallaba de forma intermitente. La solución final (`Game.resetScene()`) mantiene un único `Engine` durante toda la sesión y solo descarta/recrea la `Scene`, que es el patrón recomendado por Babylon.js para "recargar un nivel".
 - **TypeScript en modo `strict`** con `noUnusedLocals`/`noUnusedParameters` activados, para mantener el código sin variables u parámetros muertos.
 
 ---
@@ -296,7 +318,8 @@ Capturas tomadas directamente sobre la aplicación corriendo en local (`docs/evi
 ## Información para la evaluación
 
 - **Probar sin instalar nada**: <https://virtuxperience-hub.vercel.app>.
-- **Punto de entrada para revisar código**: [`src/main.ts`](src/main.ts) orquesta toda la aplicación; desde ahí es fácil rastrear cada subsistema.
+- **Para ver todas las islas sin jugar cada una**: en la consola del navegador, `localStorage.setItem("virtuxperience:badges", JSON.stringify(["comunicarte-primera-ronda","neuromath-primera-ronda","voxcivitas-primera-ronda","gerencia-primera-ronda","activaidea-primera-ronda"]))` y recargar — desbloquea las 6 islas de una vez (los IDs exactos están en `BADGE_CATALOG`, [`src/systems/BadgeSystem.ts`](src/systems/BadgeSystem.ts)).
+- **Punto de entrada para revisar código**: [`src/main.ts`](src/main.ts) orquesta el ciclo de vida landing ↔ isla; [`src/landing/LandingPage.ts`](src/landing/LandingPage.ts) es el mapa de islas y [`src/scene/Island.ts`](src/scene/Island.ts) el mundo 3D de cada una.
 - **Para revisar un minijuego específico**: abrir `src/minigames/<zona>/` — cada uno es autocontenido y sigue el mismo contrato (`ZoneEnterContext`) definido en [`src/types/zone.ts`](src/types/zone.ts).
 - **Verificación de tipos**: `npx tsc --noEmit` (sin errores).
 - **Build de producción**: `npm run build` (genera `dist/` sin errores; advertencia de tamaño de chunk esperada por el peso de Babylon.js + TensorFlow.js, no es un error).

@@ -4,6 +4,7 @@ export class HUD {
   private readonly lockHintEl: HTMLDivElement;
   private readonly badgeButtonEl: HTMLButtonElement;
   private readonly audioButtonEl: HTMLButtonElement;
+  private readonly mapButtonEl: HTMLButtonElement;
   private touchMode = false;
   private currentZoneName: string | undefined;
 
@@ -30,6 +31,16 @@ export class HUD {
     this.audioButtonEl = document.createElement("button");
     this.audioButtonEl.className = "hud-audio-button";
     root.appendChild(this.audioButtonEl);
+
+    this.mapButtonEl = document.createElement("button");
+    this.mapButtonEl.className = "hud-map-button";
+    this.mapButtonEl.textContent = "🗺️ Mapa de islas";
+    this.mapButtonEl.title = "Volver al mapa de islas (Esc)";
+    root.appendChild(this.mapButtonEl);
+  }
+
+  onMapButtonClick(handler: () => void): void {
+    this.mapButtonEl.addEventListener("click", handler);
   }
 
   onAudioButtonClick(handler: () => void): void {

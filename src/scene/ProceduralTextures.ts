@@ -1,4 +1,4 @@
-import { DynamicTexture, Scene, Texture } from "@babylonjs/core";
+import { DynamicTexture, PBRMaterial, Scene, Texture } from "@babylonjs/core";
 
 /**
  * Texturas generadas por código con Canvas 2D: el proyecto sigue siendo 100 % estático
@@ -158,6 +158,78 @@ export function createGrassCanvases(size = 512): SurfaceCanvases {
   for (let i = 0; i < height.length; i++) height[i] = fine[i] * 0.8 + macro[i] * 0.2;
 
   return { albedo: canvas, normal: heightToNormalCanvas(height, size, 2.2) };
+}
+
+/**
+ * Crea un material PBR listo para usar, con sus propias texturas (albedo + normales) ligadas a la
+ * repetición pedida. Es el punto de entrada normal para pintar cualquier superficie del proyecto
+ * (césped, arena, adoquín, piedra, agua) con las texturas de este módulo.
+ */
+export function createSurfaceMaterial(
+  scene: Scene,
+  name: string,
+  canvases: SurfaceCanvases,
+  uMeters: number,
+  vMeters: number,
+  tileMeters: number,
+  roughness: number
+): PBRMaterial {
+  const mat = new PBRMaterial(name, scene);
+  const textures = bindSurfaceTextures(name, scene, canvases, uMeters / tileMeters, vMeters / tileMeters);
+  mat.albedoTexture = textures.albedo;
+  mat.bumpTexture = textures.normal;
+  mat.metallic = 0;
+  mat.roughness = roughness;
+  // Hemisférica + sol + luz(es) de portal: con el límite por defecto (4) el material ignoraría alguna.
+  mat.maxSimultaneousLights = 8;
+  return mat;
+}
+
+/** Arena: moteado cálido fino con ondas suaves de relieve (rizaduras de playa). */
+export function createSandCanvases(size = 512): SurfaceCanvases {
+  const macro = fbmNoise(size, 5, 4, 101);
+  const ripples = fbmNoise(size, 40, 2, 103);
+  const { canvas, ctx } = createCanvas(size);
+  const image = ctx.createImageData(size, size);
+
+  const dark: Rgb = [168, 140, 96];
+  const light: Rgb = [226, 198, 150];
+
+  for (let i = 0; i < size * size; i++) {
+    const c = mix(dark, light, macro[i] * 0.7 + ripples[i] * 0.3);
+    image.data[i * 4] = c[0];
+    image.data[i * 4 + 1] = c[1];
+    image.data[i * 4 + 2] = c[2];
+    image.data[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(image, 0, 0);
+
+  const height = new Float32Array(size * size);
+  for (let i = 0; i < height.length; i++) height[i] = ripples[i];
+
+  return { albedo: canvas, normal: heightToNormalCanvas(height, size, 1.4) };
+}
+
+/** Agua: variación de color tenue (profundidad/reflejos) y un mapa de normales de oleaje que se anima por UV. */
+export function createWaterCanvases(size = 512): SurfaceCanvases {
+  const depth = fbmNoise(size, 6, 3, 211);
+  const { canvas, ctx } = createCanvas(size);
+  const image = ctx.createImageData(size, size);
+
+  const deep: Rgb = [10, 58, 74];
+  const shallow: Rgb = [30, 110, 118];
+
+  for (let i = 0; i < size * size; i++) {
+    const c = mix(deep, shallow, depth[i]);
+    image.data[i * 4] = c[0];
+    image.data[i * 4 + 1] = c[1];
+    image.data[i * 4 + 2] = c[2];
+    image.data[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(image, 0, 0);
+
+  const waves = fbmNoise(size, 10, 4, 223);
+  return { albedo: canvas, normal: heightToNormalCanvas(waves, size, 1.1) };
 }
 
 export interface PavingOptions {

@@ -11,7 +11,7 @@ import {
   GlowLayer,
   ReflectionProbe,
   RenderTargetTexture,
-  DefaultRenderingPipeline,
+  FxaaPostProcess,
   ImageProcessingConfiguration,
   Camera,
 } from "@babylonjs/core";
@@ -22,7 +22,7 @@ export interface EnvironmentHandles {
   shadowGenerator: ShadowGenerator;
   glowLayer: GlowLayer;
   setOutdoorEnabled: (enabled: boolean) => void;
-  /** Activa bloom, antialiasing, tone mapping y viñeta sobre la cámara del jugador. */
+  /** Activa antialiasing, tone mapping y viñeta sobre la cámara del jugador. */
   setupPostProcessing: (camera: Camera) => void;
 }
 
@@ -85,10 +85,11 @@ export function setupEnvironment(scene: Scene): EnvironmentHandles {
   scene.environmentTexture = probe.cubeTexture;
   scene.environmentIntensity = 0.9;
 
-  const glowLayer = new GlowLayer("hubGlow", scene, { blurKernelSize: 48 });
+  // Nombre único por escena: cada isla crea la suya y la anterior ya fue descartada, pero el merge/blur
+  // interno del GlowLayer compila su shader de forma asíncrona y un nombre repetido puede chocar con un
+  // resto de la capa previa que todavía esté terminando esa compilación.
+  const glowLayer = new GlowLayer(`glow-${scene.uid}`, scene, { blurKernelSize: 48 });
   glowLayer.intensity = 0.7;
-
-  let pipeline: DefaultRenderingPipeline | undefined;
 
   return {
     skybox,
@@ -97,37 +98,26 @@ export function setupEnvironment(scene: Scene): EnvironmentHandles {
     setOutdoorEnabled: (enabled: boolean) => {
       skybox.setEnabled(enabled);
       scene.fogEnabled = enabled;
-      if (pipeline) {
-        pipeline.bloomEnabled = enabled;
-        pipeline.fxaaEnabled = enabled;
-        pipeline.imageProcessing.vignetteEnabled = enabled;
-        pipeline.imageProcessing.toneMappingEnabled = enabled;
-      }
     },
     setupPostProcessing: (camera: Camera) => {
-      pipeline = new DefaultRenderingPipeline("hubPipeline", true, scene, [camera]);
-      pipeline.samples = 1;
-      pipeline.fxaaEnabled = true;
-
-      pipeline.bloomEnabled = true;
-      pipeline.bloomThreshold = 1.05;
-      pipeline.bloomWeight = 0.28;
-      pipeline.bloomKernel = 48;
-      pipeline.bloomScale = 0.5;
-
-      pipeline.imageProcessingEnabled = true;
-      const ip = pipeline.imageProcessing;
+      // Tone mapping/exposición/viñeta viven en la configuración de la propia escena (la aplican los
+      // materiales PBR al compilar su shader), no en un pipeline aparte: un DefaultRenderingPipeline
+      // (con bloom) compila varios shaders propios de forma asíncrona, y como cada isla crea y descarta
+      // el suyo al entrar/salir, esa compilación pendiente de la isla anterior puede chocar con la
+      // siguiente. Se evita el problema de raíz usando solo lo que no necesita un pipeline propio.
+      const ip = scene.imageProcessingConfiguration;
       ip.toneMappingEnabled = true;
       ip.toneMappingType = ImageProcessingConfiguration.TONEMAPPING_ACES;
       ip.exposure = 1.05;
-      ip.contrast = 1.12;
+      ip.contrast = 1.15;
       ip.vignetteEnabled = true;
       ip.vignetteWeight = 1.6;
       ip.vignetteStretch = 0.4;
       ip.vignetteColor = new Color4(0.05, 0.02, 0.05, 0);
-      pipeline.grainEnabled = true;
-      pipeline.grain.intensity = 4;
-      pipeline.grain.animated = true;
+
+      // Antialiasing como post-proceso suelto (un único shader simple): mismo resultado visual que la
+      // FXAA del pipeline, sin su complejidad ni su compilación asíncrona.
+      new FxaaPostProcess(`fxaa-${scene.uid}`, 1.0, camera);
     },
   };
 }
